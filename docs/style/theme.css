@@ -1,0 +1,436 @@
+
+:root {
+  --purple-900: #800080;
+  --purple-700: #A64CA6;
+  --purple-400: #C999C9;
+  --purple-100: #EBD6EB;
+  --white:       #FFFFFF;
+  --gray-50:     #FAFAFA;
+  --gray-100:    #F3F3F3;
+  --gray-800:    #2D2D2D;
+  --sidebar-width: 300px;
+}
+
+
+body {
+  font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  color: var(--gray-800);
+  background-color: var(--white);
+}
+
+
+section.cover {
+  background: linear-gradient(
+    135deg,
+    var(--purple-900) 0%,
+    var(--purple-700) 50%,
+    var(--purple-400) 100%
+  ) !important;
+}
+
+section.cover .cover-main {
+  color: var(--white);
+}
+
+section.cover h1 {
+  font-size: 3rem;
+  font-weight: 800;
+  color: var(--white) !important;
+  letter-spacing: -0.5px;
+  margin-bottom: 0.5rem;
+}
+
+section.cover h1 span {
+  color: var(--purple-100) !important;
+}
+
+section.cover p {
+  color: rgba(255, 255, 255, 0.88) !important;
+  font-size: 1.15rem;
+}
+
+
+section.cover .cover-main > p:last-child a {
+  border-radius: 8px;
+  font-weight: 600;
+  padding: 0.75rem 2rem;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+section.cover .cover-main > p:last-child a:first-child {
+  background-color: var(--white) !important;
+  color: var(--purple-900) !important;
+  border: 2px solid var(--white) !important;
+}
+
+section.cover .cover-main > p:last-child a:first-child:hover {
+  background-color: var(--purple-100) !important;
+  border-color: var(--purple-100) !important;
+}
+
+section.cover .cover-main > p:last-child a:last-child {
+  background-color: transparent !important;
+  color: var(--white) !important;
+  border: 2px solid rgba(255,255,255,0.6) !important;
+}
+
+section.cover .cover-main > p:last-child a:last-child:hover {
+  border-color: var(--white) !important;
+  background-color: rgba(255,255,255,0.1) !important;
+}
+
+
+.sidebar {
+  background-color: var(--gray-50) !important;
+  border-right: 1px solid var(--purple-100);
+  padding: 1.5rem 0;
+}
+
+
+.sidebar > h1 {
+  font-size: 1.1rem !important;
+  font-weight: 700;
+  color: var(--purple-900) !important;
+  padding: 0 1.5rem 1.25rem;
+  border-bottom: 2px solid var(--purple-100);
+  margin-bottom: 1rem;
+}
+
+.sidebar > h1 a {
+  color: inherit !important;
+  text-decoration: none;
+}
+
+
+.sidebar ul li a {
+  color: var(--gray-800) !important;
+  font-size: 0.875rem;
+  padding: 0.3rem 0;
+  transition: color 0.15s ease;
+  text-decoration: none;
+  display: block;
+}
+
+.sidebar ul li a:hover {
+  color: var(--purple-700) !important;
+}
+
+
+.sidebar ul li.active > a,
+.sidebar ul li a.active {
+  color: var(--purple-900) !important;
+  font-weight: 600;
+}
+
+.sidebar ul li p strong {
+  color: var(--purple-900);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  display: block;
+  margin: 1.25rem 0 0.4rem;
+  padding: 0;
+}
+
+
+.sidebar-toggle {
+  background-color: var(--purple-900) !important;
+  border-radius: 0 6px 6px 0;
+}
+
+.sidebar-toggle span {
+  background-color: var(--white) !important;
+}
+
+
+.content {
+  padding-top: 2rem;
+}
+
+.markdown-section h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--purple-900);
+  border-bottom: 3px solid var(--purple-100);
+  padding-bottom: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.markdown-section h2 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--purple-700);
+  margin-top: 2.5rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--purple-100);
+}
+
+.markdown-section h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--purple-900);
+  margin-top: 1.75rem;
+}
+
+.markdown-section h4 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--purple-700);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 1.5rem;
+}
+
+/* Links no conteúdo */
+.markdown-section a {
+  color: var(--purple-700) !important;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.15s;
+}
+
+.markdown-section a:hover {
+  color: var(--purple-900) !important;
+}
+
+
+.markdown-section code {
+  background-color: var(--purple-100) !important;
+  color: var(--purple-900) !important;
+  border-radius: 4px;
+  padding: 0.15em 0.45em;
+  font-size: 0.875em;
+  font-family: 'Fira Code', 'Cascadia Code', monospace;
+}
+
+.markdown-section pre {
+  background-color: #1e1127 !important; /* escuro com tom roxo */
+  border: 1px solid var(--purple-400);
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+  overflow-x: auto;
+}
+
+.markdown-section pre code {
+  background-color: transparent !important;
+  color: #e8d5e8 !important;
+  font-size: 0.85rem;
+  line-height: 1.7;
+}
+
+
+.markdown-section blockquote {
+  border-left: 4px solid var(--purple-700) !important;
+  background-color: var(--purple-100);
+  border-radius: 0 8px 8px 0;
+  padding: 1rem 1.25rem;
+  margin: 1.5rem 0;
+  color: var(--gray-800);
+}
+
+.markdown-section blockquote p {
+  margin: 0;
+}
+
+
+.markdown-section table {
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(128, 0, 128, 0.12);
+  width: 100%;
+  margin: 1.5rem 0;
+}
+
+.markdown-section thead tr {
+  background-color: var(--purple-900) !important;
+}
+
+.markdown-section thead th {
+  color: var(--white) !important;
+  font-weight: 600;
+  padding: 0.75rem 1rem;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: none !important;
+}
+
+.markdown-section tbody tr:nth-child(even) {
+  background-color: var(--purple-100) !important;
+}
+
+.markdown-section tbody tr:nth-child(odd) {
+  background-color: var(--white) !important;
+}
+
+.markdown-section tbody td {
+  padding: 0.7rem 1rem;
+  border-top: 1px solid var(--purple-100) !important;
+  border-left: none !important;
+  border-right: none !important;
+  font-size: 0.9rem;
+}
+
+.markdown-section tbody tr:hover {
+  background-color: var(--purple-100) !important;
+  transition: background-color 0.15s;
+}
+
+
+.markdown-section ul li::before {
+  color: var(--purple-700);
+}
+
+.markdown-section ul > li {
+  line-height: 1.8;
+}
+
+
+.markdown-section strong em,
+.tag {
+  background-color: var(--purple-700);
+  color: var(--white);
+  border-radius: 20px;
+  padding: 0.1em 0.6em;
+  font-size: 0.78em;
+  font-style: normal;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+
+.search {
+  border-bottom: 1px solid var(--purple-100);
+  padding: 0.75rem 1rem;
+}
+
+.search input {
+  border: 1.5px solid var(--purple-400) !important;
+  border-radius: 8px !important;
+  padding: 0.5rem 0.75rem !important;
+  font-size: 0.85rem;
+  color: var(--gray-800);
+  transition: border-color 0.2s;
+  width: 100%;
+  background-color: var(--white);
+}
+
+.search input:focus {
+  border-color: var(--purple-900) !important;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(128, 0, 128, 0.12);
+}
+
+
+.app-name-link img {
+  border-radius: 6px;
+}
+
+.docsify-pagination-container {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: space-between !important;
+  align-items: stretch !important;
+  width: 100% !important;
+  margin-top: 4rem !important;
+  gap: 1rem; 
+  box-sizing: border-box;
+}
+
+.docsify-pagination-container .pagination-item {
+  flex: 1;
+  max-width: 50%;
+}
+
+.docsify-pagination-container .pagination-item a {
+  display: flex !important;
+  flex-direction: column !important;
+  background-color: var(--white) !important;
+  color: var(--purple-700) !important;
+  border: 1.5px solid var(--purple-400) !important;
+  border-radius: 8px !important;
+  padding: 1rem 1.25rem !important;
+  transition: all 0.2s ease !important;
+  text-decoration: none !important;
+  opacity: 1 !important; 
+  width: 100% !important;
+  box-sizing: border-box;
+}
+
+.docsify-pagination-container .pagination-item--next a {
+  align-items: flex-end !important;
+  text-align: right !important;
+}
+
+.docsify-pagination-container .pagination-item--previous a {
+  align-items: flex-start !important;
+  text-align: left !important;
+}
+
+
+.docsify-pagination-container .pagination-item a:hover {
+  background-color: var(--purple-900) !important;
+  color: var(--white) !important;
+  border-color: var(--purple-900) !important;
+  opacity: 1 !important;
+}
+
+
+.docsify-pagination-container .pagination-item a .pagination-item-title,
+.docsify-pagination-container .pagination-item a .pagination-item-label {
+  color: inherit !important;
+  transition: color 0.2s ease;
+  margin: 0 !important;
+}
+
+.docsify-pagination-container .pagination-item a .pagination-item-label {
+  opacity: 0.85 !important;
+  font-size: 0.8rem;
+  margin-bottom: 0.4rem !important;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+}
+
+.markdown-section hr {
+  border: none;
+  border-top: 2px solid var(--purple-100);
+  margin: 2.5rem 0;
+}
+
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--purple-100);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--purple-400);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--purple-700);
+}
+
+
+@media (max-width: 768px) {
+  .markdown-section h1 { font-size: 1.6rem; }
+  .markdown-section h2 { font-size: 1.2rem; }
+
+  .markdown-section table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  section.cover h1 { font-size: 2rem; }
+}
