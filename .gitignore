@@ -27,6 +27,7 @@ frontend/next-env.d.ts
 # Backend (NestJS)
 backend/dist/
 backend/out-tsc/
+backend/*.tsbuildinfo
 # Cobertura de testes
 backend/coverage/
 backend/.nyc_output/
