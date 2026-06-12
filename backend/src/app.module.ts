@@ -13,7 +13,13 @@ import { TurmasModule } from './modules/turmas/turmas.module';
 import { AlunosModule } from './modules/alunos/alunos.module';
 
 @Module({
-  imports: [TurmasModule, AlunosModule],
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    AuthModule,
+    UsersModule,
+    TurmasModule,
+    AlunosModule,
+  ],
   controllers: [],
   providers: [],
 })
