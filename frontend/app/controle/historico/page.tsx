@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Days_One } from "next/font/google";
+import Header from "../../../components/Header";
 
 const daysOne = Days_One({
   weight: "400",
@@ -13,140 +14,204 @@ const daysOne = Days_One({
 export default function Historico() {
   const router = useRouter();
 
-  const [porcentagemPresentes, setPorcentagemPresentes] = useState(80);
-  const [porcentagemAusentes, setPorcentagemAusentes] = useState(40);
-  const [dataHora, setDataHora] = useState("");
+  const [porcentagemPresentes, setPorcentagemPresentes] = useState(0);
+  const [porcentagemAusentes, setPorcentagemAusentes] = useState(0);
+  const [aulaSelecionadaId, setAulaSelecionadaId] = useState("");
+  const [turmaId, setTurmaId] = useState("");
+  const [aulas, setAulas] = useState<AulaHistorico[]>([]);
+  const [carregando, setCarregando] = useState(false);
+  const [erro, setErro] = useState("");
+
+  interface FrequenciaHistorico {
+    status: "PRESENTE" | "FALTA";
+    aluno: { id: string; nome: string };
+  }
+
+  interface AulaHistorico {
+    id: string;
+    data: string;
+    hora_inicio: string;
+    hora_fim: string;
+    descricao?: string | null;
+    turma: { id: string; nome: string; codigo: string };
+    frequencias: FrequenciaHistorico[];
+  }
+
+  const aulaSelecionada = useMemo(
+    () => aulas.find((aula) => aula.id === aulaSelecionadaId) ?? aulas[0] ?? null,
+    [aulas, aulaSelecionadaId],
+  );
 
   const handleSalvar = () => {
-    console.log("Histórico salvo/exportado");
     router.push("/controle");
   };
 
+  useEffect(() => {
+    const turma = new URLSearchParams(window.location.search).get("turmaId") || "";
+    setTurmaId(turma);
+  }, []);
+
+  useEffect(() => {
+    const buscarHistorico = async () => {
+      if (!turmaId) return;
+
+      setCarregando(true);
+      setErro("");
+      try {
+        const resposta = await fetch(`/api/aulas/turma/${turmaId}`, {
+          credentials: "include",
+        });
+
+        if (resposta.ok) {
+          const dados: AulaHistorico[] = await resposta.json();
+          setAulas(dados);
+          setAulaSelecionadaId(dados[0]?.id || "");
+        } else if (resposta.status === 401 || resposta.status === 403) {
+          router.push("/");
+        } else {
+          setErro("Não foi possível carregar o histórico da turma.");
+        }
+      } catch (error) {
+        console.error("Erro ao carregar histórico", error);
+        setErro("Falha de ligação ao servidor.");
+      } finally {
+        setCarregando(false);
+      }
+    };
+
+    buscarHistorico();
+  }, [turmaId, router]);
+
+  useEffect(() => {
+    if (!aulaSelecionada) return;
+
+    const frequencias = aulaSelecionada.frequencias || [];
+    const presentes = frequencias.filter((f) => f.status === "PRESENTE").length;
+    const ausentes = frequencias.filter((f) => f.status === "FALTA").length;
+    const total = presentes + ausentes || 1;
+    setPorcentagemPresentes(Math.round((presentes / total) * 100));
+    setPorcentagemAusentes(Math.round((ausentes / total) * 100));
+  }, [aulaSelecionada]);
+
   return (
-    <div className="min-h-screen w-full flex flex-col bg-degrade-zilla overflow-x-hidden pt-6 pb-10 select-none">
-      <header className="w-full max-w-[1058px] h-[84px] mx-auto bg-black flex items-center justify-between px-10 shadow-lg">
-        <h2 className="font-aclonica text-[26px] text-white drop-shadow-sm">
-          Zilla University
-        </h2>
+    <div className="min-h-screen w-full flex flex-col bg-degrade-zilla overflow-x-hidden pb-10 select-none">
+      <Header />
 
-        <div className="w-[743px] flex items-center justify-end">
-          <nav className="flex items-center gap-10">
-            <button
-              onClick={() => router.push("/home")}
-              className="font-crimson text-[23px] font-normal text-white underline uppercase tracking-wider hover:text-[#FF8D28] transition-colors cursor-pointer"
-            >
-              Home
-            </button>
-            <button
-              onClick={() => router.push("/controle")}
-              className="font-crimson text-[23px] font-normal text-[#FF8D28] underline uppercase tracking-wider transition-colors cursor-pointer"
-            >
-              Controle
-            </button>
-          </nav>
-        </div>
-      </header>
-
-      <div className="w-full max-w-[1058px] mx-auto">
-        <main className="w-full h-[514px] bg-white flex flex-col items-center pt-5 shadow-2xl relative">
+      <div className="w-full max-w-6xl mx-auto px-4 mt-8">
+        <main className="w-full bg-white rounded-[20px] flex flex-col items-center py-8 px-4 md:px-8 shadow-2xl relative">
           <h1
-            className={`${daysOne.className} text-2xl text-black uppercase tracking-wider mb-3 text-center`}
+            className={`${daysOne.className} text-3xl text-black uppercase tracking-wider mb-6 text-center`}
           >
-            HISTÓRICO
+            HISTÓRICO DA AULA
           </h1>
 
-          <div className="w-[798px] h-[365px] bg-[#1E0144]/73 rounded-[15px] flex flex-col items-center pt-4 px-6 shadow-inner relative">
-            <div className="w-[737px] h-[46px] bg-white rounded-[15px] flex items-center px-4 shadow-md mb-6 shrink-0">
-              <label className="font-crimson text-xs font-bold text-gray-400 uppercase mr-4">
-                Selecionar Data/Hora:
+          {erro && (
+            <div className="w-full max-w-5xl mb-4 p-4 rounded-xl text-sm font-bold text-center border-2 bg-[#1a0f1f] text-[#FF8D28] border-[#FF8D28]">
+              {erro}
+            </div>
+          )}
+
+          {/* Container Roxo Escuro */}
+          <div className="w-full max-w-5xl bg-gradient-to-br from-[#1E0144] to-[#2d0266] rounded-[20px] flex flex-col pt-6 px-4 md:px-8 pb-8 shadow-inner border border-[#1E0144]/50 gap-6">
+            
+            <div className="w-full bg-white/95 rounded-xl p-4 shadow-md shrink-0 border border-white/20">
+              <label className="font-crimson text-[13px] font-bold text-gray-500 uppercase block mb-2 tracking-wider">
+                Aulas registradas
               </label>
-              <input
-                type="datetime-local"
-                value={dataHora}
-                onChange={(e) => setDataHora(e.target.value)}
-                className="flex-1 bg-transparent border-none outline-none font-crimson text-lg text-black/70 cursor-pointer"
-              />
+              <select
+                value={aulaSelecionadaId}
+                onChange={(e) => setAulaSelecionadaId(e.target.value)}
+                className="w-full bg-transparent border border-gray-200 rounded-lg px-3 py-3 font-sans text-base text-black/80 cursor-pointer outline-none"
+              >
+                {aulas.length === 0 ? (
+                  <option value="">{carregando ? "Carregando..." : "Nenhuma aula encontrada"}</option>
+                ) : (
+                  aulas.map((aula) => (
+                    <option key={aula.id} value={aula.id}>
+                      {new Date(aula.data).toLocaleDateString()} — {aula.hora_inicio} às {aula.hora_fim}
+                    </option>
+                  ))
+                )}
+              </select>
             </div>
 
-            <div className="w-[737px] h-[182px] flex gap-3 mb-10">
-              <div className="w-[152px] h-[155px] bg-white p-2.5 flex flex-col justify-between font-crimson text-black shadow-md shrink-0 rounded-sm">
+            {/* Painel Inferior (3 Colunas) */}
+            <div className="w-full flex flex-col lg:flex-row gap-5">
+              
+              {/* Coluna 1: Resumo da Turma */}
+              <div className="w-full lg:w-[220px] bg-white/95 p-6 flex flex-col gap-4 font-crimson text-black shadow-md shrink-0 rounded-xl border border-gray-100">
                 <div>
-                  <span className="block text-[10px] font-bold text-gray-400 uppercase leading-none">
-                    Turma
-                  </span>
-                  <span className="text-sm font-bold text-gray-700">
-                    Turma A
-                  </span>
+                  <span className="block text-xs font-bold text-gray-400 uppercase leading-none mb-1">Turma</span>
+                  <span className="text-lg font-bold text-gray-800">{aulaSelecionada?.turma?.nome || "--"}</span>
                 </div>
                 <div>
-                  <span className="block text-[10px] font-bold text-gray-400 uppercase leading-none">
-                    Código
-                  </span>
-                  <span className="text-xs font-mono text-gray-700">
-                    ES-2026
-                  </span>
+                  <span className="block text-xs font-bold text-gray-400 uppercase leading-none mb-1">Código</span>
+                  <span className="text-sm font-mono text-gray-600 border border-gray-200 px-2 py-0.5 bg-gray-50 rounded">{aulaSelecionada?.turma?.codigo || "--"}</span>
                 </div>
                 <div>
-                  <span className="block text-[10px] font-bold text-gray-400 uppercase leading-none">
-                    Horário
-                  </span>
-                  <span className="text-xs font-semibold text-gray-700">
-                    19:00
-                  </span>
+                  <span className="block text-xs font-bold text-gray-400 uppercase leading-none mb-1">Horário</span>
+                  <span className="text-base font-semibold text-gray-600">{aulaSelecionada ? `${aulaSelecionada.hora_inicio} - ${aulaSelecionada.hora_fim}` : "--"}</span>
                 </div>
-                <div>
-                  <span className="block text-[10px] font-bold text-gray-400 uppercase leading-none">
-                    Alunos
-                  </span>
-                  <span className="text-sm font-bold text-[#1E0144]">35</span>
+                <div className="mt-auto">
+                  <span className="block text-xs font-bold text-gray-400 uppercase leading-none mb-1">Total de Alunos</span>
+                  <span className="text-2xl font-bold text-[#1E0144]">{aulaSelecionada?.frequencias?.length || 0}</span>
                 </div>
               </div>
 
-              <div className="w-[250px] h-[155px] bg-white shadow-md p-3 flex flex-col rounded-sm">
-                <span className="block text-[10px] font-bold text-gray-400 uppercase mb-2">
+              {/* Coluna 2: Anotações da Aula */}
+              <div className="flex-1 bg-white/95 shadow-md p-5 flex flex-col rounded-xl border border-gray-100 min-h-[200px]">
+                <span className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 pb-2 border-b border-gray-100">
                   Resumo da Aula
                 </span>
                 <textarea
-                  placeholder="Escreva o que foi dado em aula..."
-                  className="w-full h-full bg-gray-50 border border-gray-100 p-2 font-crimson text-sm text-black outline-none resize-none italic"
+                  value={aulaSelecionada?.descricao || ""}
+                  readOnly
+                  placeholder="Sem observações registradas."
+                  className="w-full flex-1 bg-gray-50 border border-gray-200 rounded-lg p-3 font-sans text-sm text-gray-700 outline-none resize-none focus:border-[#FF8D28] focus:bg-white transition-all custom-scrollbar"
                 />
               </div>
 
-              <div className="w-[321px] h-[155px] bg-white shadow-md p-2 flex items-end justify-center gap-6 rounded-sm relative">
-                <div className="w-[105px] h-[131px] flex flex-col justify-end relative bg-gray-50 rounded-sm overflow-hidden border border-gray-100">
-                  <div
-                    className="w-full bg-[#14AE5C] transition-all duration-500 flex flex-col items-center justify-center p-1"
-                    style={{ height: `${porcentagemPresentes}%` }}
-                  >
-                    {porcentagemPresentes > 15 && (
-                      <span className="font-sans text-[10px] text-white font-bold tracking-wider text-center uppercase leading-tight select-none">
-                        Presentes
-                      </span>
-                    )}
+              {/* Coluna 3: Gráfico de Frequência Moderno */}
+              <div className="w-full lg:w-[280px] bg-white/95 shadow-md p-5 flex flex-col rounded-xl border border-gray-100 items-center justify-between min-h-[200px]">
+                <span className="block w-full text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 pb-2 border-b border-gray-100 text-center">
+                  Índice de Frequência
+                </span>
+                
+                <div className="flex-1 w-full flex items-end justify-center gap-8 mt-4 pb-2">
+                  {/* Barra Presentes */}
+                  <div className="flex flex-col items-center gap-2 h-full justify-end">
+                    <span className="font-sans text-sm font-bold text-[#14AE5C]">{porcentagemPresentes}%</span>
+                    <div className="w-16 h-32 bg-gray-100 rounded-t-xl flex flex-col justify-end overflow-hidden relative shadow-inner">
+                      <div
+                        className="w-full bg-gradient-to-t from-[#0d733d] to-[#14AE5C] transition-all duration-1000 rounded-t-xl"
+                        style={{ height: `${porcentagemPresentes}%` }}
+                      ></div>
+                    </div>
+                    <span className="font-crimson text-xs font-bold text-gray-500 uppercase">Presentes</span>
                   </div>
-                </div>
 
-                <div className="w-[105px] h-[106px] flex flex-col justify-end relative bg-gray-50 rounded-sm overflow-hidden border border-gray-100">
-                  <div
-                    className="w-full bg-[#900B09] transition-all duration-500 flex flex-col items-center justify-center p-1"
-                    style={{ height: `${porcentagemAusentes}%` }}
-                  >
-                    {porcentagemAusentes > 15 && (
-                      <span className="font-sans text-[10px] text-white font-bold tracking-wider text-center uppercase leading-tight select-none">
-                        Ausentes
-                      </span>
-                    )}
+                  {/* Barra Ausentes */}
+                  <div className="flex flex-col items-center gap-2 h-full justify-end">
+                    <span className="font-sans text-sm font-bold text-[#900B09]">{porcentagemAusentes}%</span>
+                    <div className="w-16 h-32 bg-gray-100 rounded-t-xl flex flex-col justify-end overflow-hidden relative shadow-inner">
+                      <div
+                        className="w-full bg-gradient-to-t from-[#590403] to-[#900B09] transition-all duration-1000 rounded-t-xl"
+                        style={{ height: `${porcentagemAusentes}%` }}
+                      ></div>
+                    </div>
+                    <span className="font-crimson text-xs font-bold text-gray-500 uppercase">Ausentes</span>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="absolute bottom-4 right-6">
+            {/* Botão de Salvar */}
+            <div className="w-full flex justify-end mt-2">
               <button
                 onClick={handleSalvar}
-                className="w-[145px] h-[35px] bg-[#FF8D28] font-crimson font-bold text-base text-white uppercase tracking-wider hover:bg-[#e0771f] active:scale-95 transition-all shadow-xl cursor-pointer flex items-center justify-center rounded-[15px]"
+                className="w-full md:w-[220px] h-[48px] bg-[#FF8D28] font-crimson font-bold text-lg text-white tracking-wider hover:bg-[#e0771f] active:scale-95 transition-all shadow-lg cursor-pointer flex items-center justify-center rounded-xl border-b-4 border-[#c46516]"
               >
-                Salvar Histórico
+                VOLTAR AO CONTROLE
               </button>
             </div>
           </div>

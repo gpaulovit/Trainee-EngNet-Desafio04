@@ -27,9 +27,10 @@ export default function RootLayout({
   return (
     <html
       lang="pt-BR"
+      suppressHydrationWarning
       className={`${crimsonText.variable} ${aclonica.variable}`}
     >
-      <body className="antialiased min-h-screen">{children}</body>
+      <body className="antialiased min-h-screen bg-degrade-zilla text-slate-900">{children}</body>
     </html>
   );
 }
