@@ -9,6 +9,7 @@ import { Aluno } from './entities/aluno.entity';
 import { Aula } from './entities/aula.entity';
 import { Frequencia } from './entities/frequencia.entity';
 
+// Módulos da sua implementação (Mantidos para o Front-end funcionar)
 import { AuthModule } from './auth/auth.module';
 import { TurmasModule } from './turmas/turmas.module';
 import { AlunosModule } from './alunos/alunos.module';
@@ -17,6 +18,9 @@ import { FrequenciasModule } from './frequencias/frequencias.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { RelatoriosModule } from './relatorios/relatorios.module';
 import { UsuariosModule } from './usuarios/usuarios.module';
+
+// Módulo exclusivo da branch developer (não dá conflito de nome)
+import { UsersModule } from './modules/users/user.module';
 
 @Module({
   imports: [
@@ -46,6 +50,7 @@ import { UsuariosModule } from './usuarios/usuarios.module';
     DashboardModule,
     RelatoriosModule,
     UsuariosModule,
+    UsersModule, // Adicionado para manter compatibilidade com a developer
   ],
   controllers: [],
   providers: [],
