@@ -8,7 +8,6 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.use(helmet());
-
   app.use(cookieParser());
 
   app.enableCors({
@@ -19,16 +18,16 @@ async function bootstrap() {
 
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true,            // Remove qualquer campo que não esteja definido no DTO
-      forbidNonWhitelisted: true, // Rejeita o pedido se o utilizador enviar campos extra
-      transform: true,            // Converte os dados automaticamente para as classes DTO
+      whitelist: true,            
+      forbidNonWhitelisted: true, 
+      transform: true,            
     }),
   );
 
   const porta = process.env.PORT || 3000;
-  await app.listen(porta);
+  // Mantemos a porta variável, mas com o '0.0.0.0' exigido pelo Docker da branch developer
+  await app.listen(porta, '0.0.0.0');
   
   console.log(` Servidor na porta: ${porta}`);
 }
-
 bootstrap();
