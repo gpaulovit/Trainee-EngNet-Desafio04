@@ -47,46 +47,56 @@ export default function EsqueciSenha() {
   };
 
   return (
-    <main className="relative min-h-screen w-full flex flex-col items-center justify-center p-4 bg-degrade-zilla overflow-hidden select-none">
+    <main className="min-h-screen w-full flex flex-col items-center justify-center p-4 bg-gray-50 dark:bg-slate-900 transition-colors duration-300">
+      
+      <div className="w-full max-w-md mb-8 text-center">
+        <h2 className="font-serif text-4xl text-primary-900 dark:text-primary-100 font-bold drop-shadow-sm">
+          Zilla University
+        </h2>
+      </div>
+
       <form
         onSubmit={handleSubmit(handleRecuperar)}
-        className="relative z-10 w-full max-w-[521px] min-h-[574px] bg-[#D06B0E] rounded-[18px] shadow-2xl flex flex-col items-center justify-center p-8 transition-all gap-6"
+        className="w-full max-w-md bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-gray-100 dark:border-slate-700 p-8 flex flex-col gap-6 transition-all"
       >
-        <h1 className="font-crimson text-white text-3xl font-bold tracking-wide mb-2 text-center">
-          RECUPERAR SENHA
-        </h1>
+        <div className="text-center">
+          <h1 className="font-serif text-2xl font-bold text-gray-900 dark:text-white">
+            Recuperar Senha
+          </h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+            Introduza o seu e-mail institucional. Enviaremos as instruções de recuperação para o seu endereço.
+          </p>
+        </div>
 
-        <p className="font-crimson text-white text-center text-base mb-4 px-4">
-          Introduza o seu e-mail institucional. Enviaremos as instruções de recuperação para o seu endereço.
-        </p>
-
-        <div className="w-full flex flex-col items-center">
-            <div className="w-full max-w-[386px] h-[46px]">
-              <input
-                type="email"
-                placeholder="E-mail Institucional"
-                {...register("email")}
-                className="w-full h-full px-5 bg-white rounded-[18px] font-crimson text-black placeholder-black/60 outline-none focus:ring-4 focus:ring-[#74095A]/50 transition-all shadow-inner disabled:opacity-50"
-                disabled={carregando}
-              />
-            </div>
-            {errors.email && <span className="text-sm font-crimson text-white bg-[#74095A] px-2 rounded mt-1">{errors.email.message}</span>}
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col">
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              E-mail Institucional
+            </label>
+            <input
+              type="email"
+              placeholder="exemplo@zilla.edu"
+              {...register("email")}
+              className="w-full h-11 px-4 bg-gray-50 dark:bg-slate-900 border border-gray-300 dark:border-slate-600 rounded-lg font-sans text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all disabled:opacity-50"
+              disabled={carregando}
+            />
+            {errors.email && <span className="text-xs font-medium text-red-500 mt-1">{errors.email.message}</span>}
           </div>
+        </div>
 
         <button
           type="submit"
           disabled={carregando}
-          className="w-[140px] h-[54px] mt-4 bg-[#74095A] rounded-[18px] text-white font-crimson font-bold text-base hover:bg-[#52043f] active:scale-95 transition-all shadow-lg disabled:opacity-70 disabled:cursor-not-allowed"
+          className="w-full h-12 mt-2 bg-primary-600 hover:bg-primary-700 active:bg-primary-800 text-white rounded-lg font-sans font-medium text-base transition-all disabled:opacity-70 disabled:cursor-not-allowed shadow-sm"
         >
-          {carregando ? "A ENVIAR..." : "ENVIAR"}
+          {carregando ? "A enviar..." : "Enviar instruções"}
         </button>
 
-        <Link 
-          href="/" 
-          className="font-crimson italic underline text-white text-sm hover:text-[#74095A] transition-colors mt-2"
-        >
-          Voltar ao Login
-        </Link>
+        <div className="flex flex-col items-center mt-2 pt-4 border-t border-gray-100 dark:border-slate-700">
+          <Link href="/" className="font-sans text-sm text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 hover:underline transition-colors">
+            Voltar ao Login
+          </Link>
+        </div>
       </form>
     </main>
   );

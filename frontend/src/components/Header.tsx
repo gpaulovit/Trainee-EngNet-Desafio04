@@ -9,8 +9,10 @@ export default function Header() {
   const pathname = usePathname();
   const [saindo, setSaindo] = useState(false);
   const [temaEscuro, setTemaEscuro] = useState(false);
+  const [montado, setMontado] = useState(false);
 
   useEffect(() => {
+    setMontado(true);
     const temaSalvo = localStorage.getItem("theme");
     const temaInicial = temaSalvo === "dark";
     setTemaEscuro(temaInicial);
@@ -18,9 +20,10 @@ export default function Header() {
   }, []);
 
   useEffect(() => {
+    if (!montado) return;
     document.documentElement.classList.toggle("dark", temaEscuro);
     localStorage.setItem("theme", temaEscuro ? "dark" : "light");
-  }, [temaEscuro]);
+  }, [temaEscuro, montado]);
 
   const isActive = (path: string) => pathname.startsWith(path);
 
@@ -39,59 +42,39 @@ export default function Header() {
   };
 
   return (
-    <header className="w-full bg-black/95 shadow-lg border-b border-white/10 backdrop-blur-md">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-auto md:h-20 flex flex-col md:flex-row items-center justify-between py-4 md:py-0 gap-4 md:gap-0">
+    <header className="w-full bg-white dark:bg-slate-800 shadow-sm border-b border-gray-200 dark:border-slate-700 transition-colors duration-300">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-auto md:h-16 flex flex-col md:flex-row items-center justify-between py-4 md:py-0 gap-4 md:gap-0">
         
-        <h2 className="font-aclonica text-2xl text-white drop-shadow-sm text-center md:text-left">
+        <h2 className="font-serif text-2xl font-bold text-primary-900 dark:text-primary-100 text-center md:text-left">
           Zilla University
         </h2>
 
-        <nav className="flex flex-wrap items-center justify-center gap-4 md:gap-8">
-          <Link
-            href="/home"
-            className={`font-crimson text-xl font-normal underline uppercase tracking-wider transition-colors ${
-              isActive("/home") ? "text-[#FF8D28]" : "text-white hover:text-[#FF8D28]"
-            }`}
-          >
-            Home
-          </Link>
-          <Link
-            href="/turmas"
-            className={`font-crimson text-xl font-normal underline uppercase tracking-wider transition-colors ${
-              isActive("/turmas") ? "text-[#FF8D28]" : "text-white hover:text-[#FF8D28]"
-            }`}
-          >
-            Turma
-          </Link>
-          <Link
-            href="/alunos"
-            className={`font-crimson text-xl font-normal underline uppercase tracking-wider transition-colors ${
-              isActive("/alunos") ? "text-[#FF8D28]" : "text-white hover:text-[#FF8D28]"
-            }`}
-          >
-            Alunos
-          </Link>
-          <Link
-            href="/controle"
-            className={`font-crimson text-xl font-normal underline uppercase tracking-wider transition-colors ${
-              isActive("/controle") ? "text-[#FF8D28]" : "text-white hover:text-[#FF8D28]"
-            }`}
-          >
-            Controle
-          </Link>
-          <Link
-            href="/relatorios"
-            className={`font-crimson text-xl font-normal underline uppercase tracking-wider transition-colors ${
-              isActive("/relatorios") ? "text-[#FF8D28]" : "text-white hover:text-[#FF8D28]"
-            }`}
-          >
-            Relatórios
-          </Link>
+        <nav className="flex flex-wrap items-center justify-center gap-4 md:gap-6">
+          {[
+            { name: "Home", path: "/home" },
+            { name: "Turmas", path: "/turmas" },
+            { name: "Alunos", path: "/alunos" },
+            { name: "Controle", path: "/controle" },
+            { name: "Relatórios", path: "/relatorios" },
+          ].map((item) => (
+            <Link
+              key={item.path}
+              href={item.path}
+              className={`font-sans text-sm font-medium transition-colors ${
+                isActive(item.path)
+                  ? "text-primary-600 dark:text-primary-400 border-b-2 border-primary-600 dark:border-primary-400 pb-1"
+                  : "text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400"
+              }`}
+            >
+              {item.name}
+            </Link>
+          ))}
+          
           <button
             type="button"
             onClick={handleLogout}
             disabled={saindo}
-            className="font-crimson text-xl font-normal underline uppercase tracking-wider transition-colors text-[#FF8D28] hover:text-white disabled:opacity-60"
+            className="font-sans text-sm font-medium text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 transition-colors disabled:opacity-60 md:ml-4"
           >
             {saindo ? "Saindo..." : "Sair"}
           </button>
@@ -99,11 +82,10 @@ export default function Header() {
           <button
             type="button"
             onClick={() => setTemaEscuro((valor) => !valor)}
-            className="flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-2 font-crimson text-base text-white hover:bg-white/20 transition-colors"
+            className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors ml-2"
             aria-label={temaEscuro ? "Ativar tema claro" : "Ativar tema escuro"}
           >
-            <span className="text-lg">{temaEscuro ? "☀" : "☾"}</span>
-            <span>{temaEscuro ? "Claro" : "Escuro"}</span>
+            <span className="text-sm">{temaEscuro ? "☀" : "☾"}</span>
           </button>
         </nav>
       </div>

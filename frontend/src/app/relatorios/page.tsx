@@ -2,14 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Days_One } from "next/font/google";
 import Header from "../../components/Header";
-
-const daysOne = Days_One({
-  weight: "400",
-  subsets: ["latin"],
-  display: "swap",
-});
 
 interface TurmaResumo {
   id: string;
@@ -157,7 +150,7 @@ export default function Relatorios() {
     const aluno = resumoAluno?.aluno;
     const dataGeracao = new Date().toLocaleString("pt-BR");
 
-    doc.setFillColor(30, 1, 68);
+    doc.setFillColor(30, 41, 59); // slate-800
     doc.rect(0, 0, 210, 24, "F");
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(18);
@@ -181,7 +174,7 @@ export default function Relatorios() {
         ["Média de presença do dashboard", `${resumoTurma?.taxaAssiduidade ?? "0%"}`],
       ],
       styles: { fontSize: 10, cellPadding: 3 },
-      headStyles: { fillColor: [30, 1, 68] },
+      headStyles: { fillColor: [30, 41, 59] },
       alternateRowStyles: { fillColor: [248, 248, 248] },
     });
 
@@ -196,8 +189,8 @@ export default function Relatorios() {
         `${item.taxaPresenca}%`,
       ]),
       styles: { fontSize: 9, cellPadding: 3 },
-      headStyles: { fillColor: [208, 107, 14] },
-      alternateRowStyles: { fillColor: [255, 247, 240] },
+      headStyles: { fillColor: [239, 68, 68] }, // red-500
+      alternateRowStyles: { fillColor: [254, 242, 242] }, // red-50
     });
 
     if (aluno) {
@@ -212,7 +205,7 @@ export default function Relatorios() {
           resumoAluno?.taxaAssiduidade ?? "0%",
         ]],
         styles: { fontSize: 10, cellPadding: 3 },
-        headStyles: { fillColor: [20, 174, 92] },
+        headStyles: { fillColor: [16, 185, 129] }, // emerald-500
       });
     }
 
@@ -230,7 +223,7 @@ export default function Relatorios() {
         head: [["Data", "Horário", "Presentes", "Faltas", "Faltosos"]],
         body: historicoRows,
         styles: { fontSize: 8, cellPadding: 2 },
-        headStyles: { fillColor: [79, 4, 116] },
+        headStyles: { fillColor: [71, 85, 105] }, // slate-600
       });
     }
 
@@ -238,68 +231,92 @@ export default function Relatorios() {
   };
 
   return (
-    <div className="min-h-screen w-full flex flex-col bg-degrade-zilla overflow-x-hidden pb-10 select-none">
+    <div className="min-h-screen w-full flex flex-col bg-gray-50 dark:bg-slate-900 transition-colors duration-300 pb-10">
       <Header />
 
-      <div className="w-full max-w-6xl mx-auto px-4 mt-8">
-        <main className="w-full bg-white rounded-[20px] flex flex-col items-center py-8 px-4 md:px-8 shadow-2xl relative">
-          <h1
-            className={`${daysOne.className} text-3xl text-black uppercase tracking-wider mb-6 text-center`}
-          >
-            RELATÓRIOS GERENCIAIS
-          </h1>
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+        <main className="w-full flex flex-col gap-6">
+          <div className="w-full flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+              <h1 className="font-serif text-3xl font-bold text-gray-900 dark:text-white">
+                Relatórios Gerenciais
+              </h1>
+              <p className="font-sans text-sm text-gray-500 dark:text-gray-400 mt-1">
+                Acompanhe indicadores de frequência e gere PDFs detalhados.
+              </p>
+            </div>
+            <button
+              onClick={handleExportar}
+              disabled={carregando}
+              className="h-10 px-5 bg-primary-600 hover:bg-primary-700 active:bg-primary-800 text-white rounded-lg font-sans font-medium text-sm transition-colors shadow-sm disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-2 shrink-0"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+              </svg>
+              {carregando ? "Gerando..." : "Exportar PDF"}
+            </button>
+          </div>
 
           {erro && (
-            <div className="w-full max-w-5xl mb-4 p-4 rounded-xl text-sm font-bold text-center border-2 bg-[#1a0f1f] text-[#FF8D28] border-[#FF8D28]">
+            <div className="w-full p-4 rounded-lg text-sm font-medium border bg-red-50 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800">
               {erro}
             </div>
           )}
 
-          {/* Container Principal Laranja (Responsivo) */}
-          <div className="w-full max-w-5xl bg-gradient-to-br from-[#D06B0E] to-[#a85509] rounded-[20px] flex flex-col lg:flex-row pt-6 px-4 md:px-8 pb-8 shadow-inner border border-[#D06B0E]/50 gap-8">
+          <div className="w-full flex flex-col lg:flex-row gap-6 items-stretch">
             
             {/* ================= COLUNA DA ESQUERDA: VISÃO DA TURMA ================= */}
-            <div className="flex-1 flex flex-col gap-4">
+            <div className="flex-1 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-200 dark:border-slate-700 p-6 flex flex-col gap-6">
               
               {/* Buscar Turma */}
-              <div className="w-full h-[48px] bg-white/95 rounded-xl flex items-center px-4 shadow-md focus-within:ring-2 focus-within:ring-white transition-all">
-                <select
-                  value={turmaSelecionada}
-                  onChange={(e) => setTurmaSelecionada(e.target.value)}
-                  className="w-full h-full bg-transparent border-none outline-none font-sans font-semibold text-sm text-gray-700 cursor-pointer appearance-none"
-                >
-                  <option value="" disabled hidden>Selecione uma Turma...</option>
-                  {turmas.map((turma) => (
-                    <option key={turma.id} value={turma.id}>
-                      {turma.codigo} - {turma.nome}
-                    </option>
-                  ))}
-                </select>
+              <div>
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">
+                  Visão Geral da Turma
+                </label>
+                <div className="relative">
+                  <select
+                    value={turmaSelecionada}
+                    onChange={(e) => setTurmaSelecionada(e.target.value)}
+                    className="w-full h-11 px-4 bg-gray-50 dark:bg-slate-900 border border-gray-300 dark:border-slate-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all text-sm appearance-none"
+                  >
+                    <option value="" disabled hidden>Selecione uma Turma...</option>
+                    {turmas.map((turma) => (
+                      <option key={turma.id} value={turma.id}>
+                        {turma.codigo} - {turma.nome}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                    <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
               </div>
 
               {/* Gráfico de Barras - Turma */}
-              <div className="w-full bg-white/95 rounded-xl shadow-md p-4 flex flex-col mb-2 border border-gray-100">
-                <span className="text-xs font-bold text-gray-400 uppercase font-sans tracking-wider mb-4 border-b border-gray-100 pb-2">
-                  Presença Média Mensal da Turma
+              <div className="w-full bg-gray-50 dark:bg-slate-900/50 rounded-xl p-5 flex flex-col border border-gray-200 dark:border-slate-700">
+                <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4 border-b border-gray-200 dark:border-slate-700 pb-2">
+                  Presença Mensal Média
                 </span>
-                <div className="w-full h-[120px] flex items-end justify-between px-2 relative">
+                <div className="w-full h-[140px] flex items-end justify-around px-2 relative mt-4">
                   {/* Linhas guias do gráfico */}
-                  <div className="absolute inset-x-0 bottom-[25%] border-t border-dashed border-gray-200 pointer-events-none" />
-                  <div className="absolute inset-x-0 bottom-[50%] border-t border-dashed border-gray-200 pointer-events-none" />
-                  <div className="absolute inset-x-0 bottom-[75%] border-t border-dashed border-gray-200 pointer-events-none" />
+                  <div className="absolute inset-x-0 bottom-[25%] border-t border-dashed border-gray-200 dark:border-slate-700 pointer-events-none" />
+                  <div className="absolute inset-x-0 bottom-[50%] border-t border-dashed border-gray-200 dark:border-slate-700 pointer-events-none" />
+                  <div className="absolute inset-x-0 bottom-[75%] border-t border-dashed border-gray-200 dark:border-slate-700 pointer-events-none" />
                   
                   {(historicoTurma.length > 0 ? historicoTurma.slice(0, 6).reverse() : []).map((aula: any) => (
-                    <div key={aula.id} className="flex flex-col items-center gap-2 z-10 w-[14%] group cursor-pointer">
-                      <span className="text-[10px] font-bold text-[#1E0144] opacity-0 group-hover:opacity-100 transition-opacity absolute -mt-5">
+                    <div key={aula.id} className="flex flex-col items-center gap-2 z-10 w-[14%] group cursor-pointer relative">
+                      <span className="text-xs font-bold text-primary-600 dark:text-primary-400 opacity-0 group-hover:opacity-100 transition-opacity absolute -top-6 bg-white dark:bg-slate-800 px-2 py-0.5 rounded shadow-sm border border-gray-100 dark:border-slate-700">
                         {aula.presentes}/{aula.presentes + aula.faltas}
                       </span>
-                      <div className="w-full max-w-[20px] h-full bg-gray-100 rounded-t-md flex items-end overflow-hidden">
+                      <div className="w-full max-w-[24px] h-[100px] bg-gray-200 dark:bg-slate-700 rounded-t-md flex items-end overflow-hidden">
                         <div
-                          className="w-full bg-gradient-to-t from-[#1E0144] to-[#4F0474] rounded-t-md transition-all duration-1000"
+                          className="w-full bg-primary-500 dark:bg-primary-600 rounded-t-md transition-all duration-1000"
                           style={{ height: `${aula.presentes + aula.faltas > 0 ? Math.round((aula.presentes / (aula.presentes + aula.faltas)) * 100) : 0}%` }}
                         />
                       </div>
-                      <span className="text-[10px] font-bold text-gray-500 uppercase">
+                      <span className="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase mt-1">
                         {new Date(aula.data).toLocaleDateString("pt-BR", { month: "short" })}
                       </span>
                     </div>
@@ -308,24 +325,24 @@ export default function Relatorios() {
               </div>
 
               {/* Lista dos Mais Faltosos */}
-              <div className="w-full flex-1 min-h-[160px] bg-white/95 rounded-xl shadow-md p-4 flex flex-col border border-gray-100">
-                <span className="text-xs font-bold text-red-600 uppercase font-sans tracking-wider mb-3 border-b border-gray-100 pb-2 flex items-center gap-2">
+              <div className="w-full flex-1 bg-red-50/50 dark:bg-red-900/10 rounded-xl p-5 flex flex-col border border-red-100 dark:border-red-900/30">
+                <span className="text-xs font-bold text-red-600 dark:text-red-400 uppercase tracking-wider mb-4 border-b border-red-200 dark:border-red-900/50 pb-2 flex items-center gap-2">
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                   </svg>
-                  Alunos Mais Faltosos
+                  Alunos com Risco de Retenção
                 </span>
                 
-                <div className="flex flex-col gap-2 overflow-y-auto max-h-[120px] custom-scrollbar pr-1">
+                <div className="flex flex-col gap-2 overflow-y-auto max-h-[140px] custom-scrollbar pr-1">
                   {carregando ? (
-                    <div className="text-sm text-gray-500">Carregando...</div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400 py-2">Carregando dados...</div>
                   ) : faltosos.length === 0 ? (
-                    <div className="text-sm text-gray-500">Nenhum aluno com risco de frequência baixa.</div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400 py-2">Frequência da turma está regular.</div>
                   ) : (
                     faltosos.map((aluno) => (
-                    <div key={aluno.id} className="flex justify-between items-center text-sm bg-red-50 p-2 rounded-lg border border-red-100 hover:bg-red-100 transition-colors">
-                      <span className="font-semibold text-gray-800 font-sans truncate">{aluno.nome}</span>
-                      <span className="text-[11px] bg-[#900B09] text-white px-2 py-1 rounded-md font-bold tracking-wider">
+                    <div key={aluno.id} className="flex justify-between items-center text-sm bg-white dark:bg-slate-800 p-3 rounded-lg border border-red-200 dark:border-red-800/50">
+                      <span className="font-medium text-gray-800 dark:text-gray-200 truncate pr-4">{aluno.nome}</span>
+                      <span className="text-xs font-bold text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-900/30 px-2.5 py-1 rounded-md shrink-0">
                         {100 - aluno.taxaPresenca}% faltas
                       </span>
                     </div>
@@ -335,50 +352,57 @@ export default function Relatorios() {
               </div>
             </div>
 
-            {/* Linha divisória em telas grandes */}
-            <div className="hidden lg:block w-[1px] bg-white/20 my-2"></div>
-
             {/* ================= COLUNA DA DIREITA: VISÃO DO ALUNO ================= */}
-            <div className="flex-1 flex flex-col gap-4">
+            <div className="flex-1 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-200 dark:border-slate-700 p-6 flex flex-col gap-6">
               
               {/* Buscar Aluno */}
-              <div className="w-full h-[48px] bg-white/95 rounded-xl flex items-center px-4 shadow-md focus-within:ring-2 focus-within:ring-white transition-all">
-                <select
-                  value={alunoSelecionado}
-                  onChange={(e) => setAlunoSelecionado(e.target.value)}
-                  className="w-full h-full bg-transparent border-none outline-none font-sans font-semibold text-sm text-gray-700 cursor-pointer appearance-none"
-                >
-                  <option value="" disabled hidden>Selecione um Aluno específico...</option>
-                  {alunos.map((aluno) => (
-                    <option key={aluno.id} value={aluno.id}>
-                      {aluno.nome} - {aluno.matricula}
-                    </option>
-                  ))}
-                </select>
+              <div>
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">
+                  Visão Individual
+                </label>
+                <div className="relative">
+                  <select
+                    value={alunoSelecionado}
+                    onChange={(e) => setAlunoSelecionado(e.target.value)}
+                    className="w-full h-11 px-4 bg-gray-50 dark:bg-slate-900 border border-gray-300 dark:border-slate-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all text-sm appearance-none"
+                  >
+                    <option value="" disabled hidden>Selecione um Aluno...</option>
+                    {alunos.map((aluno) => (
+                      <option key={aluno.id} value={aluno.id}>
+                        {aluno.nome} - {aluno.matricula}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                    <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
               </div>
 
               {/* Gráfico de Barras - Aluno */}
-              <div className="w-full bg-white/95 rounded-xl shadow-md p-4 flex flex-col mb-2 border border-gray-100">
-                <span className="text-xs font-bold text-gray-400 uppercase font-sans tracking-wider mb-4 border-b border-gray-100 pb-2">
-                  Presença Mensal do Aluno
+              <div className="w-full bg-gray-50 dark:bg-slate-900/50 rounded-xl p-5 flex flex-col border border-gray-200 dark:border-slate-700">
+                <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4 border-b border-gray-200 dark:border-slate-700 pb-2">
+                  Histórico de Chamadas
                 </span>
-                <div className="w-full h-[120px] flex items-end justify-between px-2 relative">
-                  <div className="absolute inset-x-0 bottom-[25%] border-t border-dashed border-gray-200 pointer-events-none" />
-                  <div className="absolute inset-x-0 bottom-[50%] border-t border-dashed border-gray-200 pointer-events-none" />
-                  <div className="absolute inset-x-0 bottom-[75%] border-t border-dashed border-gray-200 pointer-events-none" />
+                <div className="w-full h-[140px] flex items-end justify-around px-2 relative mt-4">
+                  <div className="absolute inset-x-0 bottom-[25%] border-t border-dashed border-gray-200 dark:border-slate-700 pointer-events-none" />
+                  <div className="absolute inset-x-0 bottom-[50%] border-t border-dashed border-gray-200 dark:border-slate-700 pointer-events-none" />
+                  <div className="absolute inset-x-0 bottom-[75%] border-t border-dashed border-gray-200 dark:border-slate-700 pointer-events-none" />
                   
                   {(historicoAluno.length > 0 ? historicoAluno.slice(0, 6).reverse() : []).map((item: any) => (
-                    <div key={item.aulaId} className="flex flex-col items-center gap-2 z-10 w-[14%] group cursor-pointer">
-                      <span className="text-[10px] font-bold text-[#14AE5C] opacity-0 group-hover:opacity-100 transition-opacity absolute -mt-5">
-                        {item.status === "presente" ? "P" : "F"}
+                    <div key={item.aulaId} className="flex flex-col items-center gap-2 z-10 w-[14%] group cursor-pointer relative">
+                      <span className={`text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity absolute -top-6 bg-white dark:bg-slate-800 px-2 py-0.5 rounded shadow-sm border border-gray-100 dark:border-slate-700 ${item.status === "presente" ? "text-primary-600 dark:text-primary-400" : "text-red-500 dark:text-red-400"}`}>
+                        {item.status === "presente" ? "Presença" : "Falta"}
                       </span>
-                      <div className="w-full max-w-[20px] h-full bg-gray-100 rounded-t-md flex items-end overflow-hidden">
+                      <div className="w-full max-w-[24px] h-[100px] bg-gray-200 dark:bg-slate-700 rounded-t-md flex items-end overflow-hidden">
                         <div
-                          className="w-full bg-gradient-to-t from-[#0d733d] to-[#14AE5C] rounded-t-md transition-all duration-1000"
+                          className={`w-full rounded-t-md transition-all duration-1000 ${item.status === "presente" ? "bg-primary-500 dark:bg-primary-600" : "bg-red-500 dark:bg-red-600"}`}
                           style={{ height: `${item.status === "presente" ? 100 : 25}%` }}
                         />
                       </div>
-                      <span className="text-[10px] font-bold text-gray-500 uppercase">
+                      <span className="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase mt-1">
                         {new Date(item.data).toLocaleDateString("pt-BR", { month: "short" })}
                       </span>
                     </div>
@@ -387,63 +411,53 @@ export default function Relatorios() {
               </div>
 
               {/* Resumo do Aluno (Donut Chart) */}
-              <div className="w-full bg-white/95 rounded-xl shadow-md p-5 flex flex-col sm:flex-row items-center font-sans mb-1 border border-gray-100 gap-6">
+              <div className="w-full bg-primary-50/50 dark:bg-primary-900/10 rounded-xl p-6 flex flex-col sm:flex-row items-center border border-primary-100 dark:border-primary-900/30 gap-6">
                 <div className="flex flex-col flex-1 w-full text-center sm:text-left">
-                  <span className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
-                    Histórico Individual
-                  </span>
-                  <span className="text-lg font-bold text-gray-800 uppercase tracking-wide mb-3">
+                  <span className="text-lg font-bold text-gray-900 dark:text-white truncate mb-4">
                     {resumoAluno?.aluno?.nome ?? "Selecione um aluno"}
                   </span>
                   
-                  <div className="bg-gray-50 rounded-lg p-3 border border-gray-100 flex flex-col gap-2 text-sm font-semibold text-gray-600">
+                  <div className="flex flex-col gap-2.5 text-sm text-gray-600 dark:text-gray-300">
                     <div className="flex justify-between items-center">
                       <span>Total de Aulas:</span>
-                      <span className="text-[#1E0144]">{historicoAluno.length}</span>
+                      <span className="font-semibold text-gray-900 dark:text-white">{historicoAluno.length}</span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span>Média de Presença:</span>
-                      <span className="text-[#14AE5C]">{taxaAluno}</span>
+                      <span className="font-semibold text-primary-600 dark:text-primary-400">{taxaAluno}</span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span>Turma:</span>
-                      <span className="text-[#4F0474]">{resumoAluno?.aluno?.turma?.codigo ?? "--"}</span>
+                      <span className="font-semibold text-gray-900 dark:text-white">{resumoAluno?.aluno?.turma?.codigo ?? "--"}</span>
                     </div>
                   </div>
                 </div>
 
-                {/* GRÁFICO DE PIZZA (DONUT) CSS MELHORADO */}
+                {/* Donut Chart Moderno */}
                 <div className="flex flex-col items-center justify-center shrink-0">
                   <div
-                    className="w-[90px] h-[90px] rounded-full shadow-md relative flex items-center justify-center"
+                    className="w-24 h-24 rounded-full relative flex items-center justify-center drop-shadow-md"
                     style={{
-                      background: `conic-gradient(#14AE5C 0% ${presencaAluno}%, #900B09 ${presencaAluno}% 100%)`,
+                      background: `conic-gradient(var(--tw-gradient-stops))`,
+                      backgroundImage: `conic-gradient(from 0deg, #10b981 0% ${presencaAluno}%, #ef4444 ${presencaAluno}% 100%)`
                     }}
                   >
-                    {/* Centro branco do donut */}
-                    <div className="w-[60px] h-[60px] bg-white rounded-full flex flex-col items-center justify-center text-gray-800 shadow-inner">
-                      <span className="text-lg font-bold leading-none">{presencaAluno}%</span>
+                    <div className="w-16 h-16 bg-white dark:bg-slate-800 rounded-full flex flex-col items-center justify-center shadow-inner">
+                      <span className="text-base font-bold text-gray-900 dark:text-white">{presencaAluno}%</span>
                     </div>
                   </div>
 
-                  {/* Legenda do Gráfico de Pizza */}
-                  <div className="flex gap-3 mt-3 text-[10px] font-sans font-bold uppercase tracking-tight">
-                    <span className="flex items-center gap-1 text-[#14AE5C]"><span className="w-2 h-2 rounded-full bg-[#14AE5C]"></span> Pres</span>
-                    <span className="flex items-center gap-1 text-[#900B09]"><span className="w-2 h-2 rounded-full bg-[#900B09]"></span> Falt</span>
+                  <div className="flex gap-4 mt-4 text-xs font-semibold uppercase tracking-wider">
+                    <span className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-500">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500"></span> Pres
+                    </span>
+                    <span className="flex items-center gap-1.5 text-red-500 dark:text-red-400">
+                      <span className="w-2 h-2 rounded-full bg-red-500"></span> Falt
+                    </span>
                   </div>
                 </div>
               </div>
 
-              {/* Botão de Exportação */}
-              <button
-                onClick={handleExportar}
-                className="w-full mt-auto h-[48px] bg-[#1E0144] rounded-xl font-sans font-bold text-sm text-white uppercase tracking-wider hover:bg-[#12002b] active:scale-95 transition-all shadow-lg flex items-center justify-center gap-2 border-b-4 border-black"
-              >
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                </svg>
-                {carregando ? "Carregando relatório..." : "Exportar Relatório PDF"}
-              </button>
             </div>
           </div>
         </main>

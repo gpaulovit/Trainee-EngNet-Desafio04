@@ -1,18 +1,19 @@
 import type { Metadata } from "next";
-import { Crimson_Text, Aclonica } from "next/font/google";
+import { Inter, Merriweather } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import "./globals.css";
 
-const crimsonText = Crimson_Text({
+const inter = Inter({
   subsets: ["latin"],
-  weight: ["400", "600", "700"],
-  variable: "--font-crimson",
+  variable: "--font-inter",
+  display: "swap",
 });
 
-const aclonica = Aclonica({
+const merriweather = Merriweather({
   subsets: ["latin"],
-  weight: ["400"],
-  variable: "--font-aclonica",
+  weight: ["300", "400", "700", "900"],
+  variable: "--font-merriweather",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -29,9 +30,17 @@ export default function RootLayout({
     <html
       lang="pt-BR"
       suppressHydrationWarning
-      className={`${crimsonText.variable} ${aclonica.variable}`}
+      className={`${inter.variable} ${merriweather.variable}`}
     >
-      <body className="antialiased min-h-screen bg-degrade-zilla text-slate-900">
+      <body className="font-sans antialiased min-h-screen transition-colors duration-300 relative">
+        <div
+          className="pointer-events-none fixed inset-0 z-[-1] opacity-50 dark:opacity-55"
+          style={{
+            backgroundImage: "url('/logofundo.png')",
+            backgroundRepeat: "repeat",
+            backgroundSize: "200px",
+          }}
+        />
         <Toaster position="top-right" />
         {children}
       </body>

@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
@@ -46,77 +45,85 @@ export default function Login() {
   };
 
   return (
-    <main className="relative min-h-screen w-full flex flex-col items-center justify-center p-4 overflow-hidden bg-degrade-zilla select-none">
+    <main className="min-h-screen w-full flex flex-col items-center justify-center p-4 bg-gray-50 dark:bg-slate-900 transition-colors duration-300">
       
-      {/* Logos laterais mantidos mas agora usando next/image corretamente */}
-      <div className="absolute left-[-150px] bottom-[-150px] w-[797px] h-[619px] pointer-events-none hidden lg:block z-0 transform -rotate-12 opacity-20">
-        <Image src="/logofundo.png" alt="Fundo" fill sizes="50vw" priority className="object-contain" />
-      </div>
-      <div className="absolute right-[-150px] top-[-150px] w-[797px] h-[619px] pointer-events-none hidden lg:block z-0 transform rotate-12 opacity-15">
-        <Image src="/logofundo.png" alt="Fundo" fill sizes="50vw" priority className="object-contain" />
+      <div className="w-full max-w-md mb-8 text-center">
+        <h2 className="font-serif text-4xl text-primary-900 dark:text-primary-100 font-bold drop-shadow-sm">
+          Zilla University
+        </h2>
+        <p className="mt-2 text-gray-500 dark:text-gray-400 font-sans">
+          Portal Acadêmico
+        </p>
       </div>
 
-      {/* Container Original Laranja (#D06B0E) MAS responsivo (w-full max-w-[521px]) */}
       <form
         onSubmit={handleSubmit(handleLogin)}
-        className="relative z-10 w-full max-w-[521px] min-h-[574px] bg-[#D06B0E] rounded-[18px] shadow-2xl flex flex-col items-center justify-between p-8 transition-all"
+        className="w-full max-w-md bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-gray-100 dark:border-slate-700 p-8 flex flex-col gap-6 transition-all"
       >
-        <h1 className="font-crimson text-white text-4xl font-bold tracking-wide mt-2 uppercase">
-          Login
-        </h1>
+        <div className="text-center">
+          <h1 className="font-serif text-2xl font-bold text-gray-900 dark:text-white">
+            Login
+          </h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            Insira suas credenciais para acessar o sistema
+          </p>
+        </div>
 
-        <div className="w-full flex flex-col items-center gap-4 my-auto">
-          <div className="w-full flex flex-col items-center">
-            <div className="w-full max-w-[386px] h-[46px]">
-              <input
-                type="email"
-                placeholder="Usuário (e-mail)"
-                {...register("email")}
-                className="w-full h-full px-5 bg-white rounded-[18px] font-crimson text-black placeholder-black/60 text-base outline-none focus:ring-4 focus:ring-[#74095A]/50 shadow-inner disabled:opacity-50"
-                disabled={carregando}
-              />
-            </div>
-            {errors.email && <span className="text-sm font-crimson text-white bg-[#74095A] px-2 rounded mt-1">{errors.email.message}</span>}
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col">
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Usuário (e-mail)
+            </label>
+            <input
+              type="email"
+              placeholder="exemplo@zilla.edu"
+              {...register("email")}
+              className="w-full h-11 px-4 bg-gray-50 dark:bg-slate-900 border border-gray-300 dark:border-slate-600 rounded-lg font-sans text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all disabled:opacity-50"
+              disabled={carregando}
+            />
+            {errors.email && (
+              <span className="text-xs font-medium text-red-500 mt-1">
+                {errors.email.message}
+              </span>
+            )}
           </div>
 
-          <div className="w-full flex flex-col items-center">
-            <div className="w-full max-w-[386px] h-[46px]">
-              <input
-                type="password"
-                placeholder="Senha"
-                {...register("senha")}
-                className="w-full h-full px-5 bg-white rounded-[18px] font-crimson text-black placeholder-black/60 text-base outline-none focus:ring-4 focus:ring-[#74095A]/50 shadow-inner disabled:opacity-50"
-                disabled={carregando}
-              />
-            </div>
-            {errors.senha && <span className="text-sm font-crimson text-white bg-[#74095A] px-2 rounded mt-1">{errors.senha.message}</span>}
-          </div>
-
-          <div className="flex flex-col items-center mt-1 gap-2">
-            <Link href="/esqueci-senha" className="font-crimson italic underline text-white text-sm hover:text-[#74095A] transition-colors">
-              Esqueci Minha Senha
-            </Link>
-            <Link href="/cadastro" className="font-crimson italic underline text-white text-sm hover:text-[#74095A] transition-colors">
-              Não tem conta? Cadastre-se
-            </Link>
+          <div className="flex flex-col">
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Senha
+            </label>
+            <input
+              type="password"
+              placeholder="••••••••"
+              {...register("senha")}
+              className="w-full h-11 px-4 bg-gray-50 dark:bg-slate-900 border border-gray-300 dark:border-slate-600 rounded-lg font-sans text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all disabled:opacity-50"
+              disabled={carregando}
+            />
+            {errors.senha && (
+              <span className="text-xs font-medium text-red-500 mt-1">
+                {errors.senha.message}
+              </span>
+            )}
           </div>
         </div>
 
-        {/* Botão original Roxo */}
         <button
           type="submit"
           disabled={carregando}
-          className="w-[140px] h-[54px] bg-[#74095A] rounded-[18px] text-white font-crimson font-bold text-base tracking-wider hover:bg-[#52043f] active:scale-95 transition-all shadow-lg flex items-center justify-center mb-2 disabled:opacity-70 disabled:cursor-not-allowed"
+          className="w-full h-12 bg-primary-600 hover:bg-primary-700 active:bg-primary-800 text-white rounded-lg font-sans font-medium text-base transition-all disabled:opacity-70 disabled:cursor-not-allowed shadow-sm mt-2"
         >
-          {carregando ? "A AGUARDAR" : "ENTRAR"}
+          {carregando ? "Autenticando..." : "Entrar no Portal"}
         </button>
-      </form>
 
-      <div className="mt-6 z-10">
-        <h2 className="font-aclonica text-[38px] text-white md:text-[#D06B0E] drop-shadow-md text-center">
-          Zilla University
-        </h2>
-      </div>
+        <div className="flex flex-col items-center mt-2 gap-3 pt-4 border-t border-gray-100 dark:border-slate-700">
+          <Link href="/esqueci-senha" className="font-sans text-sm text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 hover:underline transition-colors">
+            Esqueceu sua senha?
+          </Link>
+          <Link href="/cadastro" className="font-sans text-sm text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors">
+            Não tem uma conta? <span className="text-primary-600 dark:text-primary-400 hover:underline">Cadastre-se</span>
+          </Link>
+        </div>
+      </form>
     </main>
   );
 }

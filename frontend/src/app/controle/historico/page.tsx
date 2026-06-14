@@ -2,14 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Days_One } from "next/font/google";
 import Header from "../../../components/Header";
-
-const daysOne = Days_One({
-  weight: "400",
-  subsets: ["latin"],
-  display: "swap",
-});
 
 export default function Historico() {
   const router = useRouter();
@@ -94,126 +87,133 @@ export default function Historico() {
   }, [aulaSelecionada]);
 
   return (
-    <div className="min-h-screen w-full flex flex-col bg-degrade-zilla overflow-x-hidden pb-10 select-none">
+    <div className="min-h-screen w-full flex flex-col bg-gray-50 dark:bg-slate-900 transition-colors duration-300 pb-10">
       <Header />
 
-      <div className="w-full max-w-6xl mx-auto px-4 mt-8">
-        <main className="w-full bg-white rounded-[20px] flex flex-col items-center py-8 px-4 md:px-8 shadow-2xl relative">
-          <h1
-            className={`${daysOne.className} text-3xl text-black uppercase tracking-wider mb-6 text-center`}
-          >
-            HISTÓRICO DA AULA
-          </h1>
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+        <main className="w-full flex flex-col gap-6">
+          <div className="w-full flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+              <h1 className="font-serif text-3xl font-bold text-gray-900 dark:text-white">
+                Histórico de Frequência
+              </h1>
+              <p className="font-sans text-sm text-gray-500 dark:text-gray-400 mt-1">
+                Visualize as chamadas realizadas para esta turma.
+              </p>
+            </div>
+            <button
+              onClick={handleSalvar}
+              className="h-10 px-4 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded-lg font-sans font-medium text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors shadow-sm shrink-0"
+            >
+              Voltar ao Controle
+            </button>
+          </div>
 
           {erro && (
-            <div className="w-full max-w-5xl mb-4 p-4 rounded-xl text-sm font-bold text-center border-2 bg-[#1a0f1f] text-[#FF8D28] border-[#FF8D28]">
+            <div className="w-full p-4 rounded-lg text-sm font-medium border bg-red-50 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800">
               {erro}
             </div>
           )}
 
-          {/* Container Roxo Escuro */}
-          <div className="w-full max-w-5xl bg-gradient-to-br from-[#1E0144] to-[#2d0266] rounded-[20px] flex flex-col pt-6 px-4 md:px-8 pb-8 shadow-inner border border-[#1E0144]/50 gap-6">
+          <div className="w-full bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-200 dark:border-slate-700 p-6 flex flex-col gap-6 transition-colors duration-300">
             
-            <div className="w-full bg-white/95 rounded-xl p-4 shadow-md shrink-0 border border-white/20">
-              <label className="font-crimson text-[13px] font-bold text-gray-500 uppercase block mb-2 tracking-wider">
-                Aulas registradas
+            <div className="w-full">
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">
+                Selecionar Aula Registrada
               </label>
-              <select
-                value={aulaSelecionadaId}
-                onChange={(e) => setAulaSelecionadaId(e.target.value)}
-                className="w-full bg-transparent border border-gray-200 rounded-lg px-3 py-3 font-sans text-base text-black/80 cursor-pointer outline-none"
-              >
-                {aulas.length === 0 ? (
-                  <option value="">{carregando ? "Carregando..." : "Nenhuma aula encontrada"}</option>
-                ) : (
-                  aulas.map((aula) => (
-                    <option key={aula.id} value={aula.id}>
-                      {new Date(aula.data).toLocaleDateString()} — {aula.hora_inicio} às {aula.hora_fim}
-                    </option>
-                  ))
-                )}
-              </select>
+              <div className="relative">
+                <select
+                  value={aulaSelecionadaId}
+                  onChange={(e) => setAulaSelecionadaId(e.target.value)}
+                  className="w-full h-11 px-4 bg-gray-50 dark:bg-slate-900 border border-gray-300 dark:border-slate-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all text-sm appearance-none"
+                >
+                  {aulas.length === 0 ? (
+                    <option value="">{carregando ? "Carregando..." : "Nenhuma aula encontrada"}</option>
+                  ) : (
+                    aulas.map((aula) => (
+                      <option key={aula.id} value={aula.id}>
+                        {new Date(aula.data).toLocaleDateString()} — {aula.hora_inicio} às {aula.hora_fim}
+                      </option>
+                    ))
+                  )}
+                </select>
+                <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                  <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
             </div>
 
-            {/* Painel Inferior (3 Colunas) */}
-            <div className="w-full flex flex-col lg:flex-row gap-5">
+            <div className="w-full flex flex-col lg:flex-row gap-6 items-stretch">
               
               {/* Coluna 1: Resumo da Turma */}
-              <div className="w-full lg:w-[220px] bg-white/95 p-6 flex flex-col gap-4 font-crimson text-black shadow-md shrink-0 rounded-xl border border-gray-100">
+              <div className="w-full lg:w-64 bg-gray-50 dark:bg-slate-900/50 p-6 flex flex-col gap-4 font-sans border border-gray-200 dark:border-slate-700 rounded-xl shrink-0">
                 <div>
-                  <span className="block text-xs font-bold text-gray-400 uppercase leading-none mb-1">Turma</span>
-                  <span className="text-lg font-bold text-gray-800">{aulaSelecionada?.turma?.nome || "--"}</span>
+                  <span className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase mb-1">Turma</span>
+                  <span className="text-base font-bold text-gray-900 dark:text-white">{aulaSelecionada?.turma?.nome || "--"}</span>
                 </div>
                 <div>
-                  <span className="block text-xs font-bold text-gray-400 uppercase leading-none mb-1">Código</span>
-                  <span className="text-sm font-mono text-gray-600 border border-gray-200 px-2 py-0.5 bg-gray-50 rounded">{aulaSelecionada?.turma?.codigo || "--"}</span>
+                  <span className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase mb-1">Código</span>
+                  <span className="inline-block text-sm font-mono text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 bg-primary-50 dark:bg-primary-900/30 px-2 py-0.5 rounded">{aulaSelecionada?.turma?.codigo || "--"}</span>
                 </div>
                 <div>
-                  <span className="block text-xs font-bold text-gray-400 uppercase leading-none mb-1">Horário</span>
-                  <span className="text-base font-semibold text-gray-600">{aulaSelecionada ? `${aulaSelecionada.hora_inicio} - ${aulaSelecionada.hora_fim}` : "--"}</span>
+                  <span className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase mb-1">Horário</span>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{aulaSelecionada ? `${aulaSelecionada.hora_inicio} - ${aulaSelecionada.hora_fim}` : "--"}</span>
                 </div>
-                <div className="mt-auto">
-                  <span className="block text-xs font-bold text-gray-400 uppercase leading-none mb-1">Total de Alunos</span>
-                  <span className="text-2xl font-bold text-[#1E0144]">{aulaSelecionada?.frequencias?.length || 0}</span>
+                <div>
+                  <span className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase mb-1">Alunos Presentes</span>
+                  <span className="text-xl font-bold text-primary-600 dark:text-primary-400">{aulaSelecionada?.frequencias?.filter(f => f.status === "PRESENTE").length || 0} / {aulaSelecionada?.frequencias?.length || 0}</span>
                 </div>
               </div>
 
               {/* Coluna 2: Anotações da Aula */}
-              <div className="flex-1 bg-white/95 shadow-md p-5 flex flex-col rounded-xl border border-gray-100 min-h-[200px]">
-                <span className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 pb-2 border-b border-gray-100">
+              <div className="flex-1 bg-gray-50 dark:bg-slate-900/50 p-6 flex flex-col rounded-xl border border-gray-200 dark:border-slate-700">
+                <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3 pb-2 border-b border-gray-200 dark:border-slate-700">
                   Resumo da Aula
                 </span>
                 <textarea
                   value={aulaSelecionada?.descricao || ""}
                   readOnly
-                  placeholder="Sem observações registradas."
-                  className="w-full flex-1 bg-gray-50 border border-gray-200 rounded-lg p-3 font-sans text-sm text-gray-700 outline-none resize-none focus:border-[#FF8D28] focus:bg-white transition-all custom-scrollbar"
+                  placeholder="Nenhuma observação registrada para esta aula."
+                  className="w-full flex-1 bg-transparent border-none text-sm text-gray-700 dark:text-gray-300 outline-none resize-none custom-scrollbar p-0"
                 />
               </div>
 
-              {/* Coluna 3: Gráfico de Frequência Moderno */}
-              <div className="w-full lg:w-[280px] bg-white/95 shadow-md p-5 flex flex-col rounded-xl border border-gray-100 items-center justify-between min-h-[200px]">
-                <span className="block w-full text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 pb-2 border-b border-gray-100 text-center">
+              {/* Coluna 3: Gráfico de Frequência */}
+              <div className="w-full lg:w-72 bg-gray-50 dark:bg-slate-900/50 p-6 flex flex-col rounded-xl border border-gray-200 dark:border-slate-700 items-center justify-between">
+                <span className="block w-full text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4 pb-2 border-b border-gray-200 dark:border-slate-700 text-center">
                   Índice de Frequência
                 </span>
                 
-                <div className="flex-1 w-full flex items-end justify-center gap-8 mt-4 pb-2">
+                <div className="flex-1 w-full flex items-end justify-center gap-12 mt-4 pb-2">
                   {/* Barra Presentes */}
-                  <div className="flex flex-col items-center gap-2 h-full justify-end">
-                    <span className="font-sans text-sm font-bold text-[#14AE5C]">{porcentagemPresentes}%</span>
-                    <div className="w-16 h-32 bg-gray-100 rounded-t-xl flex flex-col justify-end overflow-hidden relative shadow-inner">
+                  <div className="flex flex-col items-center gap-2 h-full justify-end group">
+                    <span className="font-sans text-sm font-bold text-primary-600 dark:text-primary-400">{porcentagemPresentes}%</span>
+                    <div className="w-16 h-32 bg-gray-200 dark:bg-slate-700 rounded-t-xl flex flex-col justify-end overflow-hidden relative">
                       <div
-                        className="w-full bg-gradient-to-t from-[#0d733d] to-[#14AE5C] transition-all duration-1000 rounded-t-xl"
+                        className="w-full bg-primary-500 dark:bg-primary-600 transition-all duration-1000"
                         style={{ height: `${porcentagemPresentes}%` }}
                       ></div>
                     </div>
-                    <span className="font-crimson text-xs font-bold text-gray-500 uppercase">Presentes</span>
+                    <span className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Presentes</span>
                   </div>
 
                   {/* Barra Ausentes */}
-                  <div className="flex flex-col items-center gap-2 h-full justify-end">
-                    <span className="font-sans text-sm font-bold text-[#900B09]">{porcentagemAusentes}%</span>
-                    <div className="w-16 h-32 bg-gray-100 rounded-t-xl flex flex-col justify-end overflow-hidden relative shadow-inner">
+                  <div className="flex flex-col items-center gap-2 h-full justify-end group">
+                    <span className="font-sans text-sm font-bold text-red-500 dark:text-red-400">{porcentagemAusentes}%</span>
+                    <div className="w-16 h-32 bg-gray-200 dark:bg-slate-700 rounded-t-xl flex flex-col justify-end overflow-hidden relative">
                       <div
-                        className="w-full bg-gradient-to-t from-[#590403] to-[#900B09] transition-all duration-1000 rounded-t-xl"
+                        className="w-full bg-red-500 dark:bg-red-600 transition-all duration-1000"
                         style={{ height: `${porcentagemAusentes}%` }}
                       ></div>
                     </div>
-                    <span className="font-crimson text-xs font-bold text-gray-500 uppercase">Ausentes</span>
+                    <span className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Ausentes</span>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Botão de Salvar */}
-            <div className="w-full flex justify-end mt-2">
-              <button
-                onClick={handleSalvar}
-                className="w-full md:w-[220px] h-[48px] bg-[#FF8D28] font-crimson font-bold text-lg text-white tracking-wider hover:bg-[#e0771f] active:scale-95 transition-all shadow-lg cursor-pointer flex items-center justify-center rounded-xl border-b-4 border-[#c46516]"
-              >
-                VOLTAR AO CONTROLE
-              </button>
-            </div>
           </div>
         </main>
       </div>

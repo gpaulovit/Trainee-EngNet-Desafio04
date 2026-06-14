@@ -2,14 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Days_One } from "next/font/google";
 import Header from "../../components/Header";
-
-const daysOne = Days_One({
-  weight: "400",
-  subsets: ["latin"],
-  display: "swap",
-});
 
 interface Turma {
   id: string;
@@ -125,19 +118,16 @@ export default function Turmas() {
 
   const handleCriar = () => router.push("/turmas/criar");
   
-  // enviar os dados para a tela de edição
   const handleEditar = () => {
     if (!turmaSelecionada) {
       setMensagem({ texto: "Selecione uma turma antes de editar.", erro: true });
       return;
     }
     setMensagem({ texto: "", erro: false });
-    // Guarda os dados da turma selecionada temporariamente na sessão
     sessionStorage.setItem("turmaEdicao", JSON.stringify(turmaSelecionada));
     router.push("/turmas/criar");
   };
 
-  // Função para apagar a turma do banco de dados
   const handleRemover = async () => {
     if (!turmaSelecionada) return;
     const confirmacao = window.confirm(`Tem a certeza que deseja eliminar a turma ${turmaSelecionada.codigo}?`);
@@ -149,7 +139,6 @@ export default function Turmas() {
         credentials: "include",
       });
       if (resposta.ok) {
-        // Atualiza a lista visualmente sem recarregar a página
         const novaLista = turmas.filter((t) => t.id !== turmaSelecionada.id);
         setTurmas(novaLista);
         if (novaLista.length > 0) {
@@ -198,114 +187,127 @@ export default function Turmas() {
       : turmaSelecionada?.qtdAlunos ?? extrairQtdAlunosDoRaw(turmaSelecionada?.raw);
 
   return (
-    <div className="min-h-screen w-full flex flex-col bg-degrade-zilla overflow-x-hidden pb-10 select-none">
+    <div className="min-h-screen w-full flex flex-col bg-gray-50 dark:bg-slate-900 transition-colors duration-300 pb-10">
       <Header />
 
-      <div className="w-full max-w-6xl mx-auto px-4 mt-8">
-        <main className="w-full bg-white rounded-[20px] flex flex-col items-center py-8 px-4 md:px-8 shadow-2xl relative">
-          <h1 className={`${daysOne.className} text-3xl text-black uppercase tracking-wider mb-6 text-center`}>
-            GERENCIAR TURMAS
-          </h1>
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+        <main className="w-full flex flex-col gap-6">
+          <div className="w-full flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+              <h1 className="font-serif text-3xl font-bold text-gray-900 dark:text-white">
+                Gerenciar Turmas
+              </h1>
+              <p className="font-sans text-sm text-gray-500 dark:text-gray-400 mt-1">
+                Selecione uma turma para ver detalhes e alunos matriculados.
+              </p>
+            </div>
+          </div>
 
           {mensagem.texto && (
-            <div className={`w-full max-w-5xl mb-4 p-4 rounded-xl text-sm font-bold text-center border-2 ${mensagem.erro ? "bg-[#1a0f1f] text-[#FF8D28] border-[#FF8D28]" : "bg-white text-[#4F0474] border-[#FF8D28]"}`}>
+            <div className={`w-full p-4 rounded-lg text-sm font-medium border ${mensagem.erro ? "bg-red-50 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800" : "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800"}`}>
               {mensagem.texto}
             </div>
           )}
 
-          <div className="w-full max-w-5xl bg-gradient-to-br from-[#4F0474] to-[#2c0242] rounded-[20px] flex flex-col pt-6 px-4 md:px-8 pb-8 shadow-inner border border-[#4F0474]/50">
+          <div className="w-full bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-200 dark:border-slate-700 flex flex-col pt-6 px-6 pb-8 transition-colors duration-300">
             
             {/* Seletor Dinâmico de Turmas */}
-            <div className="w-full h-[54px] bg-white/95 rounded-xl flex items-center px-4 shadow-md mb-6 shrink-0 relative focus-within:ring-2 focus-within:ring-white">
-              <select
-                value={turmaSelecionada?.id || ""}
-                onChange={(e) => {
-                  const turma = turmas.find(t => t.id === e.target.value);
-                  if (turma) {
-                    setTurmaSelecionada(turma);
-                    buscarAlunosDaTurma(turma.id);
-                  } else {
-                    setTurmaSelecionada(null);
-                    setAlunosDoBanco([]);
-                  }
-                }}
-                className="w-full h-full bg-transparent border-none outline-none font-sans font-semibold text-sm text-gray-800 cursor-pointer appearance-none"
-              >
-                <option value="" disabled hidden>Selecione uma turma para gerir...</option>
-                {turmas.map(t => (
-                  <option key={t.id} value={t.id}>
-                    {t.codigo} - {t.nome}
-                  </option>
-                ))}
-              </select>
-              <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
+            <div className="w-full mb-6">
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">
+                Selecionar Turma
+              </label>
+              <div className="relative">
+                <select
+                  value={turmaSelecionada?.id || ""}
+                  onChange={(e) => {
+                    const turma = turmas.find(t => t.id === e.target.value);
+                    if (turma) {
+                      setTurmaSelecionada(turma);
+                      buscarAlunosDaTurma(turma.id);
+                    } else {
+                      setTurmaSelecionada(null);
+                      setAlunosDoBanco([]);
+                    }
+                  }}
+                  className="w-full h-11 px-4 bg-gray-50 dark:bg-slate-900 border border-gray-300 dark:border-slate-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all text-sm appearance-none"
+                >
+                  <option value="" disabled hidden>Selecione uma turma para gerir...</option>
+                  {turmas.map(t => (
+                    <option key={t.id} value={t.id}>
+                      {t.codigo} - {t.nome}
+                    </option>
+                  ))}
+                </select>
+                <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                  <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
               </div>
             </div>
 
-            <div className="w-full flex flex-wrap justify-center gap-4 md:gap-8 mb-6 shrink-0">
-              <button onClick={handleCriar} className="w-full sm:w-[160px] h-[48px] bg-[#14AE5C] rounded-xl font-crimson font-bold text-lg text-white uppercase tracking-wide hover:bg-[#0f8c4a] active:scale-95 transition-all shadow-lg border-b-4 border-[#0d733d]">
-                Criar
+            {/* BOTOES DE AÇÃO */}
+            <div className="w-full flex flex-wrap gap-4 mb-8">
+              <button onClick={handleCriar} className="flex-1 sm:flex-none min-w-[120px] h-10 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-sans font-medium text-sm transition-colors shadow-sm">
+                Criar Nova
               </button>
-              {/* NOVO: onClick do Editar adicionado */}
-              <button onClick={handleEditar} className="w-full sm:w-[160px] h-[48px] bg-[#FF8D28] rounded-xl font-crimson font-bold text-lg text-white uppercase tracking-wide hover:bg-[#e0771f] active:scale-95 transition-all shadow-lg border-b-4 border-[#c46516]">
-                Editar
+              <button onClick={handleEditar} className="flex-1 sm:flex-none min-w-[120px] h-10 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 rounded-lg font-sans font-medium text-sm transition-colors shadow-sm">
+                Editar Turma
               </button>
-              <button onClick={handleRemover} className="w-full sm:w-[160px] h-[48px] bg-[#900B09] rounded-xl font-crimson font-bold text-lg text-white uppercase tracking-wide hover:bg-[#700605] active:scale-95 transition-all shadow-lg border-b-4 border-[#590403]">
-                Remover
+              <button onClick={handleRemover} className="flex-1 sm:flex-none min-w-[120px] h-10 bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/40 border border-red-200 dark:border-red-800 rounded-lg font-sans font-medium text-sm transition-colors shadow-sm">
+                Remover Turma
               </button>
             </div>
 
-            <div className="w-full flex flex-col md:flex-row gap-5">
+            <div className="w-full flex flex-col md:flex-row gap-6 items-stretch">
               
               {/* Caixa de Detalhes Dinâmica */}
-              <div className="w-full md:w-[220px] bg-white/95 p-5 flex flex-col justify-between font-crimson text-black shadow-md shrink-0 rounded-xl">
+              <div className="w-full md:w-64 bg-gray-50 dark:bg-slate-900/50 p-6 flex flex-col gap-4 font-sans border border-gray-200 dark:border-slate-700 rounded-xl">
                 {turmaSelecionada ? (
                   <>
-                    <div className="mb-3">
-                      <span className="block text-xs font-bold text-gray-400 uppercase leading-none mb-1">Turma</span>
-                      <span className="text-base font-bold text-gray-800">{turmaSelecionada.nome}</span>
-                    </div>
-                    <div className="mb-3">
-                      <span className="block text-xs font-bold text-gray-400 uppercase leading-none mb-1">Código</span>
-                      <span className="text-sm font-mono text-gray-600 border border-gray-200 px-2 py-0.5 bg-gray-50 rounded">{turmaSelecionada.codigo}</span>
-                    </div>
-                    <div className="mb-3">
-                      <span className="block text-xs font-bold text-gray-400 uppercase leading-none mb-1">Horário</span>
-                      <span className="text-sm font-semibold text-gray-600">{turmaSelecionada.horario}</span>
+                    <div>
+                      <span className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase mb-1">Turma</span>
+                      <span className="text-base font-bold text-gray-900 dark:text-white">{turmaSelecionada.nome}</span>
                     </div>
                     <div>
-                      <span className="block text-xs font-bold text-gray-400 uppercase leading-none mb-1">Alunos (Qtd)</span>
-                      <span className="text-xl font-bold text-[#4F0474]">{qtdAlunosExibida ?? "--"} </span>
+                      <span className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase mb-1">Código</span>
+                      <span className="inline-block text-sm font-mono text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 bg-primary-50 dark:bg-primary-900/30 px-2 py-0.5 rounded">{turmaSelecionada.codigo}</span>
+                    </div>
+                    <div>
+                      <span className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase mb-1">Horário</span>
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{turmaSelecionada.horario}</span>
+                    </div>
+                    <div>
+                      <span className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase mb-1">Alunos (Qtd)</span>
+                      <span className="text-xl font-bold text-primary-600 dark:text-primary-400">{qtdAlunosExibida ?? "--"} </span>
                     </div>
                   </>
                 ) : (
                   <div className="flex flex-col items-center justify-center h-full opacity-60">
-                    <span className="font-sans text-xs text-center text-gray-500 uppercase tracking-widest mt-2">Nenhuma Turma Selecionada</span>
+                    <span className="text-xs text-center text-gray-500 uppercase mt-2 font-medium">Nenhuma Turma Selecionada</span>
                   </div>
                 )}
               </div>
 
               {/* Lista de Alunos */}
-              <div className="flex-1 bg-white/95 h-[240px] overflow-y-auto shadow-md p-4 flex flex-col gap-2 rounded-xl custom-scrollbar border border-gray-100">
-                <h4 className="font-sans text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 pb-2 border-b border-gray-100">Alunos Matriculados</h4>
+              <div className="flex-1 bg-gray-50 dark:bg-slate-900/50 h-[320px] overflow-y-auto rounded-xl custom-scrollbar border border-gray-200 dark:border-slate-700 p-4 flex flex-col gap-2">
+                <h4 className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 pb-2 border-b border-gray-200 dark:border-slate-700">Alunos Matriculados</h4>
                 {turmaSelecionada ? (
                   alunosDoBanco.length > 0 ? (
                     alunosDoBanco.map((aluno, index) => (
-                      <div key={aluno.id} className="w-full flex items-center font-crimson text-sm sm:text-base text-gray-800 py-2 px-3 bg-gray-50 border border-gray-200 rounded-lg hover:bg-[#f3e8f5] transition-colors">
-                        <span className="font-semibold text-[#4F0474] mr-2">{String(index + 1).padStart(2, "0")}.</span> {aluno.nome}
+                      <div key={aluno.id} className="w-full flex items-center text-sm py-2.5 px-4 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg text-gray-800 dark:text-gray-200">
+                        <span className="font-semibold text-gray-400 dark:text-gray-500 w-6">{String(index + 1).padStart(2, "0")}.</span> 
+                        <span className="font-medium">{aluno.nome}</span>
                       </div>
                     ))
                   ) : (
                     <div className="flex items-center justify-center h-full">
-                      <span className="font-sans text-sm italic text-gray-400">Nenhum aluno cadastrado nesta turma.</span>
+                      <span className="text-sm text-gray-500 dark:text-gray-400">Nenhum aluno cadastrado nesta turma.</span>
                     </div>
                   )
                 ) : (
                   <div className="flex items-center justify-center h-full">
-                    <span className="font-sans text-sm italic text-gray-400">Selecione uma turma para ver os alunos.</span>
+                    <span className="text-sm text-gray-500 dark:text-gray-400">Selecione uma turma para ver os alunos.</span>
                   </div>
                 )}
               </div>
