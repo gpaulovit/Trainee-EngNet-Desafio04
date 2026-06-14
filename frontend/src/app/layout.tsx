@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Crimson_Text, Aclonica } from "next/font/google";
+import { Toaster } from "react-hot-toast";
 import "./globals.css";
 
 const crimsonText = Crimson_Text({
@@ -30,7 +31,10 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${crimsonText.variable} ${aclonica.variable}`}
     >
-      <body className="antialiased min-h-screen bg-degrade-zilla text-slate-900">{children}</body>
+      <body className="antialiased min-h-screen bg-degrade-zilla text-slate-900">
+        <Toaster position="top-right" />
+        {children}
+      </body>
     </html>
   );
 }

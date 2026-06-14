@@ -1,8 +1,13 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Turma } from '../entities/turma.entity';
-import { CriarTurmaDto } from './dto/criar-turma.dto';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+  ConflictException,
+} from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { Turma } from "../entities/turma.entity";
+import { CriarTurmaDto } from "./dto/criar-turma.dto";
 
 @Injectable()
 export class TurmasService {
@@ -13,19 +18,25 @@ export class TurmasService {
 
   async criar(criarTurmaDto: CriarTurmaDto, professorId: string) {
     const novaTurma = this.turmasRepository.create({
-      curso: 'Padrão',
+      curso: "Padrão",
       ...criarTurmaDto,
-      professor: { id: professorId }, // O TypeORM liga a turma ao professor logado
+      professor: { id: professorId },
     });
-    return this.turmasRepository.save(novaTurma);
+    try {
+      return await this.turmasRepository.save(novaTurma);
+    } catch (error: any) {
+      if (error.code === '23505') {
+        throw new ConflictException('Já existe uma turma com este código.');
+      }
+      throw error;
+    }
   }
 
-  // Filtra apenas as turmas deste professor
   async listarTodas(professorId: string) {
     const turmas = await this.turmasRepository
-      .createQueryBuilder('turma')
-      .loadRelationCountAndMap('turma.qtdAlunos', 'turma.alunos')
-      .where('turma.professor_id = :professorId', { professorId })
+      .createQueryBuilder("turma")
+      .loadRelationCountAndMap("turma.qtdAlunos", "turma.alunos")
+      .where("turma.professor_id = :professorId", { professorId })
       .getMany();
 
     return turmas.map((turma: any) => ({
@@ -40,34 +51,42 @@ export class TurmasService {
   }
 
   async remover(turmaId: string, professorId: string) {
-    // Procura a turma e carrega também quem é o professor dono dela
-    const turma = await this.turmasRepository.findOne({ 
+    const turma = await this.turmasRepository.findOne({
       where: { id: turmaId },
-      relations: ['professor'], 
+      relations: ["professor"],
     });
 
     if (!turma) {
       throw new NotFoundException(`Turma não encontrada.`);
     }
 
-    // Impede que o professor A apague a turma do professor B
     if (turma.professor.id !== professorId) {
-      throw new UnauthorizedException('Você não tem permissão para remover esta turma.');
+      throw new UnauthorizedException(
+        "Você não tem permissão para remover esta turma.",
+      );
     }
 
     return this.turmasRepository.remove(turma);
   }
 
   async atualizar(turmaId: string, dados: any, professorId: string) {
-    const turma = await this.turmasRepository.findOne({ 
+    const turma = await this.turmasRepository.findOne({
       where: { id: turmaId },
-      relations: ['professor'], 
+      relations: ["professor"],
     });
 
-    if (!turma) throw new NotFoundException('Turma não encontrada.');
-    if (turma.professor.id !== professorId) throw new UnauthorizedException('Sem permissão.');
+    if (!turma) throw new NotFoundException("Turma não encontrada.");
+    if (turma.professor.id !== professorId)
+      throw new UnauthorizedException("Sem permissão.");
 
     Object.assign(turma, dados);
-    return this.turmasRepository.save(turma);
+    try {
+      return await this.turmasRepository.save(turma);
+    } catch (error: any) {
+      if (error.code === '23505') {
+        throw new ConflictException('Já existe uma turma com este código.');
+      }
+      throw error;
+    }
   }
 }

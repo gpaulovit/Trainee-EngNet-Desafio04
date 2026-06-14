@@ -4,42 +4,43 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import toast from "react-hot-toast";
+import { esqueciSenhaSchema, EsqueciSenhaFormData } from "../../validations/authSchema";
+
 export default function EsqueciSenha() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [mensagem, setMensagem] = useState("");
-  const [erro, setErro] = useState("");
   const [carregando, setCarregando] = useState(false);
 
-  const handleRecuperar = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErro("");
-    setMensagem("");
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<EsqueciSenhaFormData>({
+    resolver: zodResolver(esqueciSenhaSchema),
+  });
 
-    if (!email) {
-      setErro("Por favor, introduza o seu e-mail.");
-      return;
-    }
-
+  const handleRecuperar = async (data: EsqueciSenhaFormData) => {
     setCarregando(true);
 
     try {
       const resposta = await fetch("/api/auth/esqueci-senha", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email: data.email }),
       });
 
       if (resposta.ok) {
-        setMensagem("Se o e-mail existir no sistema, receberá as instruções. (Para testes locais, verifique o terminal do back-end).");
+        toast.success("Se o e-mail existir no sistema, você receberá as instruções.");
         // Opcional: Redireciona automaticamente de volta ao login após 6 segundos
         setTimeout(() => router.push("/"), 6000); 
       } else {
         const dadosErro = await resposta.json();
-        setErro(dadosErro.message || "Erro ao solicitar recuperação.");
+        toast.error(dadosErro.message || "Erro ao solicitar recuperação.");
       }
     } catch (error) {
-      setErro("Falha ao contactar o servidor.");
+      toast.error("Falha ao contactar o servidor.");
     } finally {
       setCarregando(false);
     }
@@ -48,8 +49,8 @@ export default function EsqueciSenha() {
   return (
     <main className="relative min-h-screen w-full flex flex-col items-center justify-center p-4 bg-degrade-zilla overflow-hidden select-none">
       <form
-        onSubmit={handleRecuperar}
-        className="relative z-10 w-full max-w-[521px] min-h-[400px] bg-[#D06B0E] rounded-[18px] shadow-2xl flex flex-col items-center justify-center p-8 transition-all gap-4"
+        onSubmit={handleSubmit(handleRecuperar)}
+        className="relative z-10 w-full max-w-[521px] min-h-[574px] bg-[#D06B0E] rounded-[18px] shadow-2xl flex flex-col items-center justify-center p-8 transition-all gap-6"
       >
         <h1 className="font-crimson text-white text-3xl font-bold tracking-wide mb-2 text-center">
           RECUPERAR SENHA
@@ -59,28 +60,18 @@ export default function EsqueciSenha() {
           Introduza o seu e-mail institucional. Enviaremos as instruções de recuperação para o seu endereço.
         </p>
 
-        <div className="w-full max-w-[386px] h-[46px]">
-          <input
-            type="email"
-            placeholder="O seu e-mail..."
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full h-full px-5 bg-white rounded-[18px] font-crimson text-black placeholder-black/60 outline-none focus:ring-4 focus:ring-[#74095A]/50 disabled:opacity-50 transition-all shadow-inner"
-            disabled={carregando}
-          />
-        </div>
-
-        {erro && (
-          <span className="text-white text-sm font-crimson bg-[#900B09] px-4 py-1 rounded-md shadow-md">
-            {erro}
-          </span>
-        )}
-        
-        {mensagem && (
-          <span className="text-white text-sm font-crimson bg-[#14AE5C] px-4 py-2 rounded-md shadow-md text-center">
-            {mensagem}
-          </span>
-        )}
+        <div className="w-full flex flex-col items-center">
+            <div className="w-full max-w-[386px] h-[46px]">
+              <input
+                type="email"
+                placeholder="E-mail Institucional"
+                {...register("email")}
+                className="w-full h-full px-5 bg-white rounded-[18px] font-crimson text-black placeholder-black/60 outline-none focus:ring-4 focus:ring-[#74095A]/50 transition-all shadow-inner disabled:opacity-50"
+                disabled={carregando}
+              />
+            </div>
+            {errors.email && <span className="text-sm font-crimson text-white bg-[#74095A] px-2 rounded mt-1">{errors.email.message}</span>}
+          </div>
 
         <button
           type="submit"
