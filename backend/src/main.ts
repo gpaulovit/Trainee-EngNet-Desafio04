@@ -4,10 +4,11 @@ import { ValidationPipe } from "@nestjs/common";
 import { ExpressAdapter } from "@nestjs/platform-express";
 import cookieParser from "cookie-parser"; 
 import helmet from "helmet";
-import express = require("express"); 
+import express from "express"; 
 
 const server = express(); 
 
+// Remove o prefixo se necessário (mantido caso seu front antigo usasse)
 server.use((req, res, next) => {
   if (req.url.startsWith('/_backend')) {
     req.url = req.url.replace('/_backend', '');
@@ -18,17 +19,18 @@ server.use((req, res, next) => {
   next();
 });
 
-let isAppInitialized = false;
-
-// Função centralizada de configuração compartilhada entre local e nuvem
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, new ExpressAdapter(server));
 
   app.use(helmet());
   app.use(cookieParser());
 
+  // CONFIGURAÇÃO DO CORS
   app.enableCors({
-    origin: ["http://localhost:3001", "http://localhost:3000", /\.vercel\.app$/],
+    // Adicionei a env FRONTEND_URL. Se ela não existir, ele usa a lista padrão que você já tinha.
+    origin: process.env.FRONTEND_URL 
+      ? [process.env.FRONTEND_URL, "http://localhost:3001", "http://localhost:3000", /\.vercel\.app$/]
+      : ["http://localhost:3001", "http://localhost:3000", /\.vercel\.app$/],
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true,
   });
@@ -41,27 +43,12 @@ async function bootstrap() {
     }),
   );
 
-  return app;
+  // O Railway e o Docker exigem escutar em '0.0.0.0'. 
+  // A porta DEVE ser a do processo do Railway (process.env.PORT) ou 3000 como fallback local.
+  const port = process.env.PORT || 3000;
+  
+  await app.listen(port, '0.0.0.0');
+  console.log(`🚀 Backend rodando com sucesso na porta ${port} (0.0.0.0)!`);
 }
 
-// 🚀 AMBIENTE LOCAL (DOCKER / MÁQUINA FISICA)
-// Se NÃO estiver rodando na Vercel, inicia o servidor HTTP tradicional na porta 3000
-if (!process.env.VERCEL) {
-  bootstrap().then(async (app) => {
-    // Escuta explicitamente na interface '0.0.0.0' para permitir conexões do Docker
-    await app.listen(3000, '0.0.0.0');
-    console.log("🚀 Backend HTTP rodando com sucesso localmente na porta 3000 (0.0.0.0)!");
-  });
-}
-
-// ☁️ AMBIENTE DE PRODUÇÃO (VERCEL SERVERLESS)
-// Mantém o export padrão para a Vercel conseguir envelopar a rota
-export default async (req: any, res: any) => {
-  if (!isAppInitialized) {
-    const app = await bootstrap();
-    await app.init();
-    isAppInitialized = true;
-  }
-
-  return server(req, res);
-};
+bootstrap();
