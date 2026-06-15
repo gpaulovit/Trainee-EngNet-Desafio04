@@ -35,11 +35,11 @@ export const apiClient = async <T = any>(
 
   const baseURL = process.env.NEXT_PUBLIC_API_URL || '';
   
-  const cleanEndpoint = endpoint.replace(/^api\//, '').startsWith('/') 
-    ? endpoint.replace(/^api\//, '') 
-    : `/${endpoint.replace(/^api\//, '')}`;
-    
-  const fullURL = `${baseURL}${cleanEndpoint}`;
+  const cleanEndpoint = endpoint.replace(/^\/?api\//, '');
+  
+  const fullURL = baseURL 
+    ? `${baseURL.replace(/\/$/, '')}/${cleanEndpoint.replace(/^\//, '')}`
+    : `/api/${cleanEndpoint.replace(/^\//, '')}`; 
 
   const response = await fetch(fullURL, config);
   
