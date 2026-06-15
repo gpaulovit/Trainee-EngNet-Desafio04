@@ -9,18 +9,12 @@ import express from "express";
 const server = express(); 
 
 // Remove o prefixo se necessário (mantido caso seu front antigo usasse)
-server.use((req, res, next) => {
-  if (req.url.startsWith('/_backend')) {
-    req.url = req.url.replace('/_backend', '');
-    if (!req.url.startsWith('/')) {
-      req.url = '/' + req.url;
-    }
-  }
-  next();
-});
+
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, new ExpressAdapter(server));
+
+  app.setGlobalPrefix('api');
 
   app.use(helmet());
   app.use(cookieParser());
