@@ -3,18 +3,11 @@ import React from "react";
 export default function AlertMessage({ mensagem, erro, theme = "light" }: { mensagem: string; erro: boolean; theme?: "light" | "dark" }) {
   if (!mensagem) return null;
 
-  const isDark = theme === "dark";
-
-  const errorClass = isDark 
-    ? "bg-[#1a0f1f] text-[#FF8D28] border-[#FF8D28]" 
-    : "bg-white text-red-600 border-red-600";
-    
-  const successClass = isDark
-    ? "bg-[#1a0f1f] text-green-400 border-green-500"
-    : "bg-green-100 text-green-700 border-green-500";
+  const errorClass = "bg-red-50 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800";
+  const successClass = "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800";
 
   return (
-    <div className={`w-full mb-6 p-4 rounded-xl text-sm font-bold text-center border-2 ${erro ? errorClass : successClass}`}>
+    <div className={`w-full mb-6 p-4 rounded-xl text-sm font-medium text-center border ${erro ? errorClass : successClass}`}>
       {mensagem}
     </div>
   );

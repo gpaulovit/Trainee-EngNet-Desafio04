@@ -1,74 +1,82 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
-  --font-crimson: "Crimson Text", serif;
-  --font-aclonica: "Aclonica", sans-serif;
+    --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+    --font-serif: var(--font-merriweather), ui-serif, Georgia, serif;
+
+    --color-atomic-tangerine: #ff7e39;
+    --color-carbon-black: #262626;
+    --color-ash-grey: #acbfa4;
+    --color-ash-grey-2: #c7d4b9;
+    --color-beige: #e2e8ce;
+    --color-thistle: #e3c0d3;
+
+    --color-primary-50: #fff4ed;
+    --color-primary-100: #ffe4d4;
+    --color-primary-200: var(--color-thistle);
+    --color-primary-300: #ffb48e;
+    --color-primary-400: #ff9865;
+    --color-primary-500: var(--color-atomic-tangerine);
+    --color-primary-600: #e66a2c;
+    --color-primary-700: #bf5520;
+    --color-primary-800: #994317;
+    --color-primary-900: var(--color-carbon-black);
+
+    --color-gray-50: var(--color-beige);
+    --color-gray-100: var(--color-ash-grey-2);
+    --color-gray-200: var(--color-ash-grey);
+    --color-gray-300: #94a78c;
+    --color-gray-400: #7d8f76;
+    --color-gray-500: #65765f;
+    --color-gray-600: #4e5e49;
+    --color-gray-700: #384534;
+    --color-gray-800: #212c1e;
+    --color-gray-900: var(--color-carbon-black);
+
+    --color-slate-50: var(--color-beige);
+    --color-slate-600: #4a4a4a;
+    --color-slate-700: #3b3b3b;
+    --color-slate-800: #303030;
+    --color-slate-900: var(--color-carbon-black);
+}
+
+@layer base {
+    body {
+        @apply bg-gray-50 text-gray-900 antialiased;
+    }
+
+    .dark body {
+        @apply bg-slate-900 text-gray-100;
+    }
 }
 
 @layer utilities {
-  /* Alterado para Degradê Linear: Começa 100% branco no topo/esquerda (0%) e vai até o laranja puro embaixo/direita (100%) */
-  .bg-degrade-zilla {
-    background: linear-gradient(135deg, #ffffff 0%, #ff8d28 100%) !important;
-  }
-
-  .dark .bg-degrade-zilla {
-    background: linear-gradient(135deg, #020617 0%, #111827 55%, #3b0764 100%) !important;
-  }
-
-  .dark body {
-    background: #020617;
-    color: #e5e7eb;
-  }
-
-  .dark .bg-white,
-  .dark .bg-white\/95,
-  .dark .bg-white\/90 {
-    background-color: #0f172a !important;
-  }
-
-  .dark .bg-gray-50 {
-    background-color: #111827 !important;
-  }
-
-  .dark .bg-gray-100 {
-    background-color: #1f2937 !important;
-  }
-
-  .dark .text-black,
-  .dark .text-gray-900,
-  .dark .text-gray-800,
-  .dark .text-gray-700,
-  .dark .text-gray-600,
-  .dark .text-gray-500 {
-    color: #e5e7eb !important;
-  }
-
-  .dark .text-gray-400 {
-    color: #94a3b8 !important;
-  }
-
-  .dark .border-gray-100,
-  .dark .border-gray-200 {
-    border-color: #334155 !important;
-  }
-
-  .dark .shadow-md,
-  .dark .shadow-lg,
-  .dark .shadow-2xl {
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45) !important;
-  }
-}
-
-body {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        @apply bg-gray-300 rounded-full;
+    }
+    .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+        @apply bg-gray-700;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        @apply bg-gray-400;
+    }
+    .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        @apply bg-gray-600;
+    }
 }
 
 html {
-  color-scheme: light;
+    color-scheme: light;
 }
 
 html.dark {
-  color-scheme: dark;
+    color-scheme: dark;
 }
