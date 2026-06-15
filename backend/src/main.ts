@@ -18,29 +18,32 @@ server.use((req, res, next) => {
   next();
 });
 
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule, new ExpressAdapter(server));
+let isAppInitialized = false;
 
-  app.use(helmet());
-  app.use(cookieParser());
+export default async (req: any, res: any) => {
+  if (!isAppInitialized) {
+    const app = await NestFactory.create(AppModule, new ExpressAdapter(server));
 
-  app.enableCors({
-    origin: ["http://localhost:3001", /\.vercel\.app$/],
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-    credentials: true,
-  });
+    app.use(helmet());
+    app.use(cookieParser());
 
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: true,
-      transform: true,
-    }),
-  );
+    app.enableCors({
+      origin: ["http://localhost:3001", /\.vercel\.app$/],
+      methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+      credentials: true,
+    });
 
-  await app.init();
-}
+    app.useGlobalPipes(
+      new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+      }),
+    );
 
-bootstrap();
+    await app.init();
+    isAppInitialized = true;
+  }
 
-export default server;
+  return server(req, res);
+};
