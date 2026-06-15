@@ -1,25 +1,42 @@
-import { Controller, Post, Body, HttpCode, HttpStatus, Get, UseGuards, Req } from '@nestjs/common';
+import { Controller, Post, Body, UnauthorizedException, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
+import { Throttle } from '@nestjs/throttler';
 import { LoginDto } from './dto/login.dto';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { Response } from 'express';
 
-@Controller('auth')//define o prefixo como /auth
+@Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private authService: AuthService) {}
 
+  @Throttle({ default: { limit: 3, ttl: 60000 } })
   @Post('login')
-  @HttpCode(HttpStatus.OK) // Força o retorno do status HTTP 200 ao invés de 201
-  async login(@Body() loginDto: LoginDto) {
-    return this.authService.login(loginDto);//repassa a requisicao para o service
+  async login(@Body() loginDto: LoginDto, @Res({ passthrough: true }) res: Response) {
+    const usuarioValidado = await this.authService.validarUsuario(loginDto.email, loginDto.senha);
+    
+    if (!usuarioValidado) {
+      throw new UnauthorizedException('Credenciais inválidas');
+    }
+
+    const token = await this.authService.login(usuarioValidado);
+
+    res.cookie('access_token', token.access_token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 3600000,
+    });
+
+    return { message: 'Login realizado com sucesso' };
   }
 
-  @Get('profile')
-  @UseGuards(JwtAuthGuard) //  o guard entra aqui trancando a rota
-  getProfile(@Req() req) {
-    //se o token for válido, o nest injeta os dados do user dentro de req.user
-    return {
-      mensagem: 'Você acessou uma rota privada com sucesso!',
-      usuario: req.user,
-    };
+  @Post('logout')
+  async logout(@Res({ passthrough: true }) res: Response) {
+    res.clearCookie('access_token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+    });
+
+    return { message: 'Logout realizado com sucesso' };
   }
 }

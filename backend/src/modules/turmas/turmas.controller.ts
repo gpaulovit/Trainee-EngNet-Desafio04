@@ -1,20 +1,35 @@
-import { Controller, Get, Post, Body } from '@nestjs/common';
+import { Controller, Post, Get, Delete, Patch, Param, Body, UseGuards, Req } from '@nestjs/common';
 import { TurmasService } from './turmas.service';
-import { CreateTurmaDto } from './dto/create-turma.dto';
+import { CriarTurmaDto } from './dto/criar-turma.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'; 
 
+@UseGuards(JwtAuthGuard)
 @Controller('turmas')
 export class TurmasController {
-  // Injeção de Dependência
   constructor(private readonly turmasService: TurmasService) {}
 
   @Post()
-  create(@Body() createTurmaDto: CreateTurmaDto) {
-    // O ValidationPipe global garante que createTurmaDto é seguro
-    return this.turmasService.create(createTurmaDto);
+  async criar(@Body() criarTurmaDto: CriarTurmaDto, @Req() req: any) {
+    const professorId = req.user.id; 
+    return this.turmasService.criar(criarTurmaDto, professorId);
   }
 
   @Get()
-  findAll() {
-    return this.turmasService.findAll();
+  async listarTodas(@Req() req: any) {
+    const professorId = req.user.id;
+    return this.turmasService.listarTodas(professorId); 
+  }
+
+  @Delete(':id')
+  async remover(@Param('id') id: string, @Req() req: any) {
+    const professorId = req.user.id;
+    return this.turmasService.remover(id, professorId);
+  }
+
+  @Patch(':id')
+  async atualizar(@Param('id') id: string, @Body() dadosAtualizados: any, @Req() req: any) {
+    const professorId = req.user.id;
+    return this.turmasService.atualizar(id, dadosAtualizados, professorId);
   }
 }
+
