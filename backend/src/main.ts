@@ -2,7 +2,7 @@ import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
 import { ValidationPipe } from "@nestjs/common";
 import { ExpressAdapter } from "@nestjs/platform-express";
-import cookieParser = require("cookie-parser");
+import * as cookieParser from "cookie-parser";
 import helmet from "helmet";
 import * as express from "express";
 
