@@ -4,11 +4,19 @@ import { ValidationPipe } from "@nestjs/common";
 import { ExpressAdapter } from "@nestjs/platform-express";
 import cookieParser from "cookie-parser"; 
 import helmet from "helmet";
-
 import express = require("express"); 
 
-
 const server = express(); 
+
+server.use((req, res, next) => {
+  if (req.url.startsWith('/_backend')) {
+    req.url = req.url.replace('/_backend', '');
+    if (!req.url.startsWith('/')) {
+      req.url = '/' + req.url;
+    }
+  }
+  next();
+});
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, new ExpressAdapter(server));
