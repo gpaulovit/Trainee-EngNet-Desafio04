@@ -1,22 +1,32 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
+import { NestFactory } from "@nestjs/core";
+import { AppModule } from "./app.module";
+import { ValidationPipe } from "@nestjs/common";
+import cookieParser = require("cookie-parser");
+import helmet from "helmet";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  
-  // Habilita a validação global com base nos DTOs
-  app.useGlobalPipes(new ValidationPipe({
-    whitelist: true, // Remove campos que não estão no DTO
-    forbidNonWhitelisted: true, // Retorna erro se enviar campo não esperado
-    transform: true, // Transforma os dados recebidos para os tipos do DTO
-  }));
-  
-  // Habilita o CORS para o frontend (porta 3001)
+
+  app.use(helmet());
+  app.use(cookieParser());
+
   app.enableCors({
-    origin: '*', // Para fins de desenvolvimento
+    origin: "http://localhost:3001",
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    credentials: true,
   });
 
-  await app.listen(3000);
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
+
+  const porta = process.env.PORT || 3000;
+  await app.listen(porta, "0.0.0.0");
+
+  console.log(` Servidor na porta: ${porta}`);
 }
 bootstrap();
