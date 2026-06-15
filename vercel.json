@@ -5,6 +5,9 @@
     { "src": "backend/src/main.ts", "use": "@vercel/node" }
   ],
   "rewrites": [
-    { "source": "/_backend/:path*", "destination": "backend/src/main.ts" }
+    {
+      "source": "/_backend/:match*",
+      "destination": "backend/src/main.ts?match=$1"
+    }
   ]
 }
