@@ -13,8 +13,6 @@ const server = express();
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, new ExpressAdapter(server));
 
-  app.setGlobalPrefix('_backend');
-
   app.use(helmet());
   app.use(cookieParser());
 
