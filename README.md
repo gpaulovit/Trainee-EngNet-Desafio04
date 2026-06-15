@@ -1,6 +1,5 @@
 # Trainee-EngNet-Desafio04
 
-
 # PresençaAcadêmica — EngNet
 
 > Sistema de gestão de frequência digital para aulas práticas e laboratoriais.
@@ -23,11 +22,20 @@ O **PresençaAcadêmica** é uma plataforma web desenvolvida pela equipe **EngNe
 
 | Camada | Tecnologia |
 |---|---|
-| **Frontend** | Next.js 14 + Tailwind CSS + TypeScript |
+| **Frontend** | Next.js 16 + Tailwind CSS + TypeScript |
 | **Backend** | NestJS + API REST + TypeORM |
 | **Banco de dados** | PostgreSQL 15 |
 | **Infraestrutura** | Docker + Docker Compose |
-| **Deploy** | Vercel (frontend) + Render (backend) |
+| **Deploy** | Frontend e API preparados para publicação em ambiente separado |
+
+## Funcionalidades entregues
+
+- **Dashboard** com total de alunos, total de aulas, taxa média de presença e alertas de baixa frequência;
+- **Turmas** com criação, edição, remoção e listagem de alunos por turma;
+- **Controle de frequência** com presença, falta, data, horário, observações e histórico;
+- **Relatórios** por turma e por aluno, com lista de faltosos e exportação em PDF;
+- **Autenticação** com JWT em cookie e proteção de rotas sensíveis.
+- **Dark mode** com alternância visual e persistência local.
 
 ## Como iniciar
 
@@ -43,7 +51,32 @@ cp .env.example .env
 docker compose up -d
 ```
 
-Acesse `http://localhost:3001` para o frontend e `http://localhost:3000/api` para a API.
+Acesse `http://localhost:3001` para o frontend e `http://localhost:3000` para a API.
+
+## Comandos úteis
+
+```bash
+# Backend
+cd backend
+npm install
+npm run start:dev
+
+# Frontend
+cd frontend
+npm install
+npm run dev
+
+# Builds de validação
+cd backend && npm run build
+cd frontend && npm run build
+```
+
+## Entrega
+
+- **Código-fonte completo** presente neste repositório;
+- **README** com instruções de execução local;
+- **API REST** e persistência com PostgreSQL via TypeORM;
+- **UI responsiva** em desktop, tablet e mobile.
 
 ## Navegação da documentação
 
