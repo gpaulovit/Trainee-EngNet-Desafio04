@@ -9,7 +9,6 @@ import * as express from "express";
 const server = express();
 
 async function bootstrap() {
-
   const app = await NestFactory.create(AppModule, new ExpressAdapter(server));
 
   app.use(helmet());
@@ -32,6 +31,7 @@ async function bootstrap() {
 
   await app.init();
 }
+
 
 bootstrap();
 
