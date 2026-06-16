@@ -9,6 +9,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
 import { esqueciSenhaSchema, EsqueciSenhaFormData } from "../../validations/authSchema";
 
+import { api } from "@/src/services/apiClient";
+
 export default function EsqueciSenha() {
   const router = useRouter();
   const [carregando, setCarregando] = useState(false);
@@ -25,22 +27,19 @@ export default function EsqueciSenha() {
     setCarregando(true);
 
     try {
-      const resposta = await fetch("/api/auth/esqueci-senha", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: data.email }),
+      // 2. SUBSTITUÍMOS O FETCH PELO NOSSO CLIENTE CUSTOMIZADO
+      // Ele remove o prefixo /api/ e joga a requisição direto para o servidor do Railway
+      await api.post("auth/esqueci-senha", {
+        email: data.email,
       });
 
-      if (resposta.ok) {
-        toast.success("Se o e-mail existir no sistema, você receberá as instruções.");
-        // Opcional: Redireciona automaticamente de volta ao login após 6 segundos
-        setTimeout(() => router.push("/"), 6000); 
-      } else {
-        const dadosErro = await resposta.json();
-        toast.error(dadosErro.message || "Erro ao solicitar recuperação.");
-      }
-    } catch (error) {
-      toast.error("Falha ao contactar o servidor.");
+      toast.success("Se o e-mail existir no sistema, você receberá as instruções.");
+      // Opcional: Redireciona automaticamente de volta ao login após 6 segundos
+      setTimeout(() => router.push("/"), 6000); 
+    } catch (error: any) {
+      // 3. CAPTURAMOS A MENSAGEM TRATADA RETORNADA DO BACKEND
+      const mensagemErro = error.data?.message || error.message || "Erro ao solicitar recuperação.";
+      toast.error(mensagemErro);
     } finally {
       setCarregando(false);
     }
