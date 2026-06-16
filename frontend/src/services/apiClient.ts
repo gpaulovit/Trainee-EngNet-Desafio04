@@ -36,26 +36,25 @@ export const apiClient = async <T = any>(
   // Verifica se o código está rodando no Servidor (Node) ou no Navegador (window)
   const isServer = typeof window === 'undefined';
 
+  // Fallback rígido para o Railway caso as variáveis da Vercel falhem em produção
+  const railwayURL = "https://trainee-engnet-desafio04-production.up.railway.app";
+
   const baseURL = isServer
-    ? (process.env.NEXT_PUBLIC_SERVER_API_URL || process.env.NEXT_PUBLIC_API_URL || '')
-    : (process.env.NEXT_PUBLIC_API_URL || '');
+    ? (process.env.NEXT_PUBLIC_SERVER_API_URL || process.env.NEXT_PUBLIC_API_URL || railwayURL)
+    : (process.env.NEXT_PUBLIC_API_URL || railwayURL);
+    
   let fullURL: string;
 
-  // 2. Se o endpoint já for uma URL absoluta (ex: http://...), usa ele direto
+  // Se o endpoint já for uma URL absoluta (ex: http://...), usa ele direto
   if (/^https?:\/\//i.test(endpoint)) {
     fullURL = endpoint;
   } else {
-    // Remove o prefixo '/api' ou 'api/' se ele existir no início do endpoint
+    // Remove o prefixo '/api' ou 'api/' se ele existir no início do endpoint passado na chamada
     const cleanEndpoint = endpoint.replace(/^\/?api\//, '');
 
-    if (baseURL) {
-      // Se houver baseURL (ex: backend separado no Render/Railway)
-      fullURL = `${baseURL.replace(/\/$/, '')}/${cleanEndpoint.replace(/^\//, '')}`;
-    } else {
-      // Se NÃO houver baseURL (usa rotas relativas do próprio Next.js)
-      // Mantém o /api/ porque a rota interna do Next precisa dele
-      fullURL = `/api/${cleanEndpoint.replace(/^\//, '')}`;
-    }
+    // Garante a formatação limpando barras soltas e injetando o prefixo obrigatório do NestJS (/api)
+    const formattedBase = baseURL.replace(/\/$/, '');
+    fullURL = `${formattedBase}/api/${cleanEndpoint.replace(/^\//, '')}`;
   }
 
   const response = await fetch(fullURL, config);
