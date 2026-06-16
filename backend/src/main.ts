@@ -8,6 +8,8 @@ import express from "express";
 
 const server = express(); 
 
+server.set('trust proxy', 1);
+
 // Remove o prefixo se necessário (mantido caso seu front antigo usasse)
 
 
