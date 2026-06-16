@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Header from "../../components/Header";
+import { api } from "../../services/apiClient";
 
 export default function Home() {
   const router = useRouter();
@@ -19,27 +20,23 @@ export default function Home() {
   const [carregando, setCarregando] = useState(true);
 
   const handleLogout = async () => {
-    try {
-      await fetch("/api/auth/logout", {
-        method: "POST",
-        credentials: "include",
-      });
-    } finally {
-      router.push("/");
-      router.refresh();
-    }
-  };
+  try {
+    // Passando o corpo vazio {} e a configuração vazia {} para satisfazer a assinatura de 2-3 argumentos
+    await api.post("/api/auth/logout", {}, {});
+  } catch (error) {
+    console.error("Erro ao fazer logout:", error);
+  } finally {
+    router.push("/");
+    router.refresh();
+  }
+};
 
   useEffect(() => {
     const buscarDadosDashboard = async () => {
       try {
-        const resposta = await fetch("/api/dashboard", {
-          method: "GET",
-          credentials: "include", 
-        });
+        const dadosAPI = await api.get<any>("/api/dashboard");
 
-        if (resposta.ok) {
-          const dadosAPI = await resposta.json();
+        if (dadosAPI) {
           setDados({
             totalAlunos: dadosAPI.totalAlunos ?? 0,
             totalAulas: dadosAPI.totalAulas ?? 0,
@@ -48,11 +45,14 @@ export default function Home() {
             mensagem: dadosAPI.mensagem ?? "Nenhum alerta.",
             alertasBaixaFrequencia: dadosAPI.alertasBaixaFrequencia ?? [],
           });
-        } else if (resposta.status === 401 || resposta.status === 403) {
+        }
+      } catch (error: any) {
+        console.error("Erro ao buscar dados do dashboard:", error);
+        
+        // Trata erro de autenticação caso a resposta seja 401 ou 403
+        if (error.response?.status === 401 || error.response?.status === 403) {
           router.push("/");
         }
-      } catch (error) {
-        console.error("Erro:", error);
       } finally {
         setCarregando(false);
       }
